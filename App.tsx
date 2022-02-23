@@ -14,6 +14,7 @@ import {
   StyleSheet,
   PermissionsAndroid,
   Platform,
+  NativeModules,
 } from 'react-native';
 import { SMap, AppInfo, FileTools, SLocation } from 'imobile_for_reactnative'
 import Root from '@/Root'
@@ -21,6 +22,7 @@ import { ConstPath, DEFAULT_USER_NAME, DEFAULT_LANGUAGE } from '@/constants'
 import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
 import { Toast } from '@/utils';
+let AppUtils = NativeModules.AppUtils
 
 interface Props {
   device: Device,
@@ -62,9 +64,9 @@ class AppRoot extends React.Component<Props> {
         isAllGranted = results[key] === 'granted' && isAllGranted
       }
       //申请 android 11 读写权限
-      // let permisson11 = await AppUtils.requestStoragePermissionR()
-      // if (isAllGranted && permisson11) {
-      if (isAllGranted) {
+      let permisson11 = await AppUtils.requestStoragePermissionR()
+      if (isAllGranted && permisson11) {
+      // if (isAllGranted) {
         await this.init()
       } else {
         await this.init()
