@@ -15,4 +15,6 @@ export default {
   bgW,
   fontColorGray,
   blue: '#4BA0FF',
+  fontColorGray2: '#BCC3CE',
+  red: '#FF0000',
 }

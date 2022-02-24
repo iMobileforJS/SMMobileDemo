@@ -14,6 +14,9 @@ import {
   StyleSheet,
   PermissionsAndroid,
   Platform,
+  NativeModules,
+  View,
+  Button,
 } from 'react-native';
 import { SMap, AppInfo, FileTools, SLocation } from 'imobile_for_reactnative'
 import Root from '@/Root'
@@ -21,15 +24,29 @@ import { ConstPath, DEFAULT_USER_NAME, DEFAULT_LANGUAGE } from '@/constants'
 import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
 import { Toast } from '@/utils';
+import { Dialog } from '@/components';
+import Loading from '@/components/Container/Loading';
+let AppUtils = NativeModules.AppUtils
 
 interface Props {
   device: Device,
   setShow: (params: {orientation: string}) => Promise<void>,
 }
 
-class AppRoot extends React.Component<Props> {
+interface State {
+  isInit: INIT_STATUS,
+}
+
+type INIT_STATUS = 'permission' | 'init' | 'done'
+
+class AppRoot extends React.Component<Props, State> {
+  dialog: Dialog | null | undefined
+  Loading: Loading | null | undefined
   constructor(props: Props) {
     super(props)
+    this.state = {
+      isInit: 'permission',
+    }
   }
 
   async componentDidMount() {
@@ -49,6 +66,7 @@ class AppRoot extends React.Component<Props> {
    */
   requestPermission = async () => {
     try {
+      this.Loading?.setLoading(true, '权限申请中')
       const results: any = await PermissionsAndroid.requestMultiple([
         'android.permission.READ_PHONE_STATE',
         // 'android.permission.ACCESS_FINE_LOCATION',
@@ -61,15 +79,18 @@ class AppRoot extends React.Component<Props> {
       for (let key in results) {
         isAllGranted = results[key] === 'granted' && isAllGranted
       }
+      this.Loading?.setLoading(false)
       //申请 android 11 读写权限
-      // let permisson11 = await AppUtils.requestStoragePermissionR()
-      // if (isAllGranted && permisson11) {
-      if (isAllGranted) {
+      let permisson11 = await AppUtils.requestStoragePermissionR()
+      console.warn(isAllGranted, permisson11)
+      if (isAllGranted && permisson11) {
         await this.init()
       } else {
-        await this.init()
+        // this.dialog?.setDialogVisible(true)
+        this.requestPermission()
       }
     } catch (error) {
+      this.Loading?.setLoading(false)
       console.warn('requestPermission error: ' + error)
     }
   }
@@ -79,6 +100,7 @@ class AppRoot extends React.Component<Props> {
    */
   init = async () => {
     try {
+      this.Loading?.setLoading(true, '初始化中')
       this.initOrientation()
       await SMap.setPermisson(true) // 权限申请
       await this.initEnvironment() // 初始化环境
@@ -91,8 +113,22 @@ class AppRoot extends React.Component<Props> {
       if (!result) {
         await SMap.activateLicense('5DC4B-F3774-304B4-E93DA-D2F00') // 许可激活码 xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
       }
+      if (Platform.OS === 'android') {
+        // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
+        const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
+        await AppUtils.copyAssetFileToSDcard('Navigation_EXAMPLE.zip', toPath)
+
+        this.setState({
+          isInit: 'done',
+        }, () => {
+          this.Loading?.setLoading(false)
+        })
+      } else {
+        this.Loading?.setLoading(false)
+      }
       Toast.show(result ? '激活成功' : '激活失败')
     } catch (error) {
+      this.Loading?.setLoading(false)
       console.warn('init error')
     }
   }
@@ -166,8 +202,30 @@ class AppRoot extends React.Component<Props> {
     return this.props.device
   }
 
+  renderInitView = () => {
+    return (
+      <View style={{paddingVertical: 30}}>
+        <Button title={this.state.isInit === 'permission' ? '申请权限' : '激活'} onPress={this.requestPermission}/>
+      </View>
+    )
+  }
+
   render() {
-    return <Root />
+    return (
+      <>
+        {
+          this.state.isInit === 'done' ? <Root /> : this.renderInitView()
+        }
+        <Loading ref={ref => this.Loading = ref} initLoading={false} />
+        {/* <Dialog
+          ref={ref => this.dialog = ref}
+          title={'111111'}
+          confirmAction={this.requestPermission}
+        >
+
+        </Dialog> */}
+      </>
+    )
   }
 }
 

@@ -4,6 +4,9 @@ import Loading from "./Loading"
 import ImageButton from "./ImageButton"
 import SearchBar from "./SearchBar"
 import HardwareBackHandler from "./HardwareBackHandler"
+import {
+  Dialog,
+} from "./Dialog"
 
 export {
   Container,
@@ -12,4 +15,5 @@ export {
   ImageButton,
   SearchBar,
   HardwareBackHandler,
+  Dialog,
 }
