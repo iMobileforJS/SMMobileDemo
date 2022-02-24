@@ -5,6 +5,7 @@ const icon_turn_right = require('./icon_turn_right.png')
 const icon_u_turn = require('./icon_u_turn.png')
 const icon_plot_new = require('./icon_plot_new.png')
 const icon_navigation = require('./icon_navigation.png')
+const dataset_type_else_black = require('./dataset_type_else_black.png')
 
 export default {
   icon_traffic_off,
@@ -14,4 +15,5 @@ export default {
   icon_u_turn,
   icon_plot_new,
   icon_navigation,
+  dataset_type_else_black,
 }

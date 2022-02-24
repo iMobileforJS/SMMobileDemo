@@ -255,7 +255,7 @@ export default class NavigationView extends MapView<Props, State> {
           }}
         />
         <ImageButton
-          image={getAssets().navigation.icon_navigation}
+          image={getAssets().navigation.dataset_type_else_black}
           title={'模拟'}
           onPress={() => {
             this.showFullMap(true)
