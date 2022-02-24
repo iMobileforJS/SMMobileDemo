@@ -56,14 +56,17 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
       let defaultDataExist = await FileTools.fileIsExist(path)
       let mapFileExist = await FileTools.fileIsExist(mapPath)
       if (defaultDataExist && !mapFileExist) {
+        // 导入地图数据
         result = await SMap.importWorkspaceInfo(data)
       }
       if (result) {
+        // 打开地图
         let mapInfo = await this.props.openMap({
           name: 'beijing',
           path: mapPath,
         })
         // await SMap.openDatasource(ConstOnline.TrafficMap.DSParams, ConstOnline.TrafficMap.layerIndex, false)
+        // 获取地图信息
         const mapInfo2 = await SMap.getMapInfo()
       }
 

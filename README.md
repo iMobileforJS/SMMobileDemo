@@ -10,7 +10,13 @@ npm install
 // 若某个三方库没有添加到Android工程中,则执行以下命令
 react-native link xxx(三方库名字)
 ```
-<h4>2. Android权限及许可配置 </h4>
+<h4>2. 下载imobile_for_reactnative aar包和示范数据 </h4>
+因aar包和示范数据过大,从云盘下载后,放入指定位置
+
+1. Navigation_EXAMPLE.zip 放入/SMMobileDemo/android/app/src/main/assets/中
+2. imobile_for_reactnative.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中
+
+<h4>3. Android权限及许可配置 </h4>
 
 ```xml
 // AndroidManifest.xml 添加许可(可根据实际使用功能,增删许可)
@@ -54,7 +60,7 @@ PermissionsAndroid.requestMultiple([
 <uses-library android:name="org.apache.http.legacy" android:required="false" />
 ```
 
-<h4>3. 运行Demo</h4>
+<h4>4. 运行Demo</h4>
 
 1) 启动服务
 ```
@@ -65,21 +71,54 @@ react-native start
 使用Android Studio直接安装
 
 </br>
-<h3>二. 使用imobile_for_reactnative</h3>
+<h3>二. 使用imobile_for_reactnative进行导航示例</h3>
 
 ```typescript
 import React from 'react'
-import { SMMapView, SMap } from 'imobile_for_reactnative'
+import { SMMapView, SMap, FileTools, WorkspaceType } from 'imobile_for_reactnative'
 
 export default MapView extends React.Component {
   // ...
 
   _onGetInstance = () => {
-    // ...
-    SMap.openMap(mapName)
-    // ...
+    try {
+      const home = await FileTools.appendingHomeDirectory()
+
+      const exampleMapName = 'beijing'
+
+      const path = `${home + ConstPath.ExternalData}/Navigation_EXAMPLE/${exampleMapName}.smwu`
+      const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map + exampleMapName}.xml`
+
+      const data = {
+        server: path,
+        type: WorkspaceType.SMWU,
+      }
+      let result: string[] = []
+      let defaultDataExist = await FileTools.fileIsExist(path)
+      let mapFileExist = await FileTools.fileIsExist(mapPath)
+      if (defaultDataExist && !mapFileExist) {
+        // 导入地图数据
+        result = await SMap.importWorkspaceInfo(data)
+      }
+      if (result) {
+        // 打开地图
+        let mapInfo = await this.props.openMap({
+          name: 'beijing',
+          path: mapPath,
+        })
+        // await SMap.openDatasource(ConstOnline.TrafficMap.DSParams, ConstOnline.TrafficMap.layerIndex, false)
+        // 获取地图信息
+        const mapInfo2 = await SMap.getMapInfo()
+      }
+
+      // 显示全副地图
+      // SMap.viewEntire()
+    } catch(e) {
+
+    }
   }
 
+  /** 路径分析 */
   analystRoat = async () => {
     try {
       //添加起点，添加终点 设置室外导航参数 进行室外路径分析
@@ -97,6 +136,7 @@ export default MapView extends React.Component {
     }
   }
 
+  /** 导航 */
   navigate = () => {
     try {
       // 导航类型 0:真实导航 1:模拟导航
