@@ -111,7 +111,7 @@ class AppRoot extends React.Component<Props, State> {
 
       let result = await SMap.applyTrialLicense()
       if (!result) {
-        await SMap.activateLicense('5DC4B-F3774-304B4-E93DA-D2F00') // 许可激活码 xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
+        await SMap.activateLicense('') // 许可激活码 xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
       }
       if (Platform.OS === 'android') {
         // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
