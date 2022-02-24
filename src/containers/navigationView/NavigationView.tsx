@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import MapView from "../mapView/MapView";
-import { scaleSize, TouchAction } from "@/utils";
+import { scaleSize, TouchAction, Toast } from "@/utils";
 import { Props as HeaderProps } from "@/components/Header/Header";
 import { TrafficView, MapSelectButton } from './components';
 import { TouchMode } from '@/constants';
@@ -69,6 +69,7 @@ export default class NavigationView extends MapView<Props, State> {
       isResponseHeader: true,
     }
   }
+  
 
   /**
    * 设置楼层id
@@ -119,6 +120,7 @@ export default class NavigationView extends MapView<Props, State> {
           this.changeFloorID(currentFloorID)
         },
       })
+      Toast.show('长按选择起点')
     } catch (error) {
       
     }
@@ -126,6 +128,8 @@ export default class NavigationView extends MapView<Props, State> {
 
   componentWillUnmount() {
     // await SMap.closeWorkspace()
+    SMap.deleteGestureDetector()
+    this.clear()
   }
 
   addMap = async () => {
@@ -147,22 +151,11 @@ export default class NavigationView extends MapView<Props, State> {
           x: event.LLPoint.x,
           y: event.LLPoint.y,
         })
-        //显示选点界面的顶部 底部组件
-        // GLOBAL.MAPSELECTPOINT.setVisible(true)
-        // GLOBAL.MAPSELECTPOINTBUTTON.setVisible(true, {
-        //   button: getLanguage(GLOBAL.language).Map_Main_Menu.SET_AS_START_POINT,
-        // })
         this.mapSelectButton?.setVisible(true, {
           button: getLanguage().Navigation.SET_AS_START_POINT,
         })
         //全幅
         this.showFullMap()
-        //导航选点 全屏时保留mapController
-        // GLOBAL.mapController && GLOBAL.mapController.setVisible(true)
-        // this.props.setMapNavigation({
-        //   isShow: true,
-        //   name: '',
-        // })
         break
       case TouchMode.NAVIGATION_TOUCH_END:
         await SMap.getEndPoint(event.LLPoint.x, event.LLPoint.y, false)
@@ -174,28 +167,17 @@ export default class NavigationView extends MapView<Props, State> {
           y: event.LLPoint.y,
         })
         break
-      // case TouchMode.MAP_TOPO_SPLIT_BY_POINT: {
-      //   const data = ToolbarModule.getData()
-      //   const point = event.screenPoint
-      //   data?.actions?.pointSplitLine(point)
-      //   GLOBAL.bubblePane && GLOBAL.bubblePane.clear()
-      //   break
-      // }
-      // case TouchMode.MAP_TOPO_TRIM_LINE:
-      // // case TouchMode.MAP_TOPO_EXTEND_LINE:
-      // {
-      //   // const data = ToolbarModule.getData()
-      //   const point = event.screenPoint
-      //   ToolbarModule.addData({ point })
-      //   let params = {
-      //     point,
-      //     ...GLOBAL.INCREMENT_DATA,
-      //     secondLine: true,
-      //   }
-      //   SMap.drawSelectedLineOnTrackingLayer(params)
-      //   GLOBAL.bubblePane && GLOBAL.bubblePane.clear()
-      //   break
-      // }
+    }
+  }
+
+  clear = () => {
+    try {
+      SMap.removeAllCallout()
+      SMap.removePOICallout()
+      SMap.clearPoint()
+      TouchAction.setTouchMode(TouchMode.NORMAL)
+    } catch (error) {
+      
     }
   }
   
@@ -285,9 +267,9 @@ export default class NavigationView extends MapView<Props, State> {
           image={getAssets().mapTools.icon_location}
           title={'清除'}
           onPress={() => {
-            SMap.removeAllCallout()
-            SMap.removePOICallout()
-            SMap.clearPoint()
+            this.clear()
+            this.mapSelectButton?.setVisible(false)
+            Toast.show('长按选择起点')
           }}
         />
       </View>

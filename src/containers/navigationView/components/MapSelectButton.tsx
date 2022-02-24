@@ -431,14 +431,14 @@ export default class MapSelectButton extends React.Component<Props, State> {
               startPoint.x,
               startPoint.y,
               endPoint.x,
-              startPoint.y,
+              endPoint.y,
             )
             if (result) {
               //室外路径分析成功 获取路径长度 路径信息
               pathLength = await SMap.getNavPathLength(false)
               path = await SMap.getPathInfos(false)
               //当前全局导航模式设置为室外
-              GLOBAL.CURRENT_NAV_MODE = 'OUTDOOR'
+              // GLOBAL.CURRENT_NAV_MODE = 'OUTDOOR'
             } else {
               //分析失败(500m范围内找不到路网点的情况)或者选择的点不在选择的路网数据集bounds范围内
               Toast.show(
@@ -481,51 +481,24 @@ export default class MapSelectButton extends React.Component<Props, State> {
       ) {
         let startPoint = TouchAction.getTouchStartPoint()
         if (startPoint) {
-          let startName =
-            (await FetchUtils.getPointName(startPoint.x, startPoint.y)) ||
-            `${getLanguage().Navigation.START_POINT
-            }(${startPoint.x.toFixed(6)},${startPoint.y.toFixed(6)})`
-          if (this.state.firstpage) {
-            let startFloorID = await SMap.getCurrentFloorID()
-            TouchAction.setTouchStartFloorID(startFloorID)
-            TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_END)
-            this.setState({
-              show: false,
-            })
-          } else {
-            let endPoint = TouchAction.getTouchEndPoint()
-            await SMap.getEndPoint(
-              endPoint.x,
-              endPoint.y,
-              false,
-              this.props.floorID,
-            )
-          }
+          let startFloorID = await SMap.getCurrentFloorID()
+          TouchAction.setTouchStartFloorID(startFloorID)
+          TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_END)
+          this.setState({
+            show: false,
+          })
+          Toast.show('长按选择终点')
         }
       } else {
         let endPoint = TouchAction.getTouchEndPoint()
-        if (endPoint.x) {
-          let endName =
-            (await FetchUtils.getPointName(endPoint.x, endPoint.y)) ||
-            `${getLanguage().Navigation.END_POINT
-            }(${endPoint.x.toFixed(6)},${endPoint.y.toFixed(6)})`
-          if (this.state.firstpage) {
-            let endFloorID = await SMap.getCurrentFloorID()
-            TouchAction.setTouchEndFloorID(endFloorID)
-            TouchAction.setTouchMode(TouchMode.NORMAL)
-            this.setState({
-              show: true,
-              button: getLanguage().Navigation.ROUTE_ANALYST,
-            })
-          } else {
-            let startPoint = TouchAction.getTouchStartPoint()
-            await SMap.getStartPoint(
-              startPoint.x,
-              startPoint.y,
-              false,
-              this.props.floorID,
-            )
-          }
+        if (endPoint) {
+          let endFloorID = await SMap.getCurrentFloorID()
+          TouchAction.setTouchEndFloorID(endFloorID)
+          TouchAction.setTouchMode(TouchMode.NORMAL)
+          this.setState({
+            show: true,
+            button: getLanguage().Navigation.ROUTE_ANALYST,
+          })
         } else {
           Toast.show(getLanguage().Navigation.TOUCH_TO_ADD_END)
         }
