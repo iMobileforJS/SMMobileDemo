@@ -15,17 +15,18 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.smmobiledemo.MainActivity;
+import com.supermap.RNUtils.AppInfo;
+import com.supermap.RNUtils.FileTools;
+import com.supermap.RNUtils.Utils;
 import com.supermap.containts.EventConst;
 import com.supermap.interfaces.utils.SLocation;
 
 import java.util.Locale;
-import java.util.Map;
 
 public class AppUtils extends ReactContextBaseJavaModule {
     private static ReactContext mReactContext;
+    public static final String SDCARD = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
 
     public AppUtils(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -82,6 +83,23 @@ public class AppUtils extends ReactContextBaseJavaModule {
                 }
             } else {
                 promise.resolve(true);
+            }
+        } catch (Exception e) {
+            promise.resolve(false);
+        }
+    }
+
+    @ReactMethod
+    public void copyAssetFileToSDcard(String fileName, String toPath, Promise promise) {
+        try {
+            String originName = fileName;
+            String defaultDataZip = fileName;
+            Utils.copyAssetFileToSDcard(mReactContext, toPath, originName, defaultDataZip);
+            if (Utils.fileIsExist(toPath + defaultDataZip)) {
+                FileTools.unZipFile(toPath + defaultDataZip, toPath);
+                promise.resolve(true);
+            } else {
+                promise.resolve(false);
             }
         } catch (Exception e) {
             promise.resolve(false);

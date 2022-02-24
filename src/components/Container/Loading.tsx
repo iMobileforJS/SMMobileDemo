@@ -25,7 +25,7 @@ export interface Extra {
 interface State {
   animating: boolean,
   info: string,
-  extra: Extra,
+  extra: Extra | undefined,
 }
 
 export default class Loading extends Component<Props, State> {
@@ -51,8 +51,8 @@ export default class Loading extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      animating: props.initLoading,
-      info: props.info,
+      animating: !!props.initLoading,
+      info: props.info || '',
       extra: {
         bgColor: props.bgColor,
         timeout: props.timeout,

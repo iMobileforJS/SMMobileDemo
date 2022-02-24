@@ -17,10 +17,10 @@ export default function Root() {
       }}
     >
       <Stack.Navigator
-        headerMode={'none'}
         initialRouteName="Home"
         screenOptions={{
           cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+          headerShown: false,
         }}>
         <Stack.Screen name="Home" component={Home} />
         {/* <Stack.Screen name="MapView" component={MapView} /> */}
