@@ -40,6 +40,7 @@ export default class MapSelectButton extends React.Component<Props, State> {
     currentDatasource: [], //当前使用的数据源
     currentDataset: {}, //当前使用的数据集
   }
+  navigationResult = false
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -88,7 +89,7 @@ export default class MapSelectButton extends React.Component<Props, State> {
     let startPoint = TouchAction.getTouchStartPoint()
     let endPoint = TouchAction.getTouchEndPoint()
     //起点终点都选择完成的情况下，进入路径分析
-    if (startPoint.x !== undefined && endPoint.x !== undefined) {
+    if (startPoint && endPoint && startPoint.x !== undefined && endPoint.x !== undefined) {
       //重置TouchMode，显示Loading组件
       TouchAction.setTouchMode(TouchMode.NORMAL)
       this.props.setLoading(
@@ -228,8 +229,8 @@ export default class MapSelectButton extends React.Component<Props, State> {
           //设置室内导航参数
           await SMap.startIndoorNavigation(commonIndoorInfo[0].datasourceName)
           //进行室内导航路径分析
-          let rel = await SMap.beginIndoorNavigation()
-          if (!rel) {
+          this.navigationResult = await SMap.beginIndoorNavigation()
+          if (!this.navigationResult) {
             this.props.setLoading(false)
             Toast.show(getLanguage().Navigation.PATH_ANALYSIS_FAILED)
             return
@@ -308,8 +309,8 @@ export default class MapSelectButton extends React.Component<Props, State> {
                 startIndoorInfo[0].datasourceName,
               )
               //进行室内路径分析
-              let rel = await SMap.beginIndoorNavigation()
-              if (!rel) {
+              this.navigationResult = await SMap.beginIndoorNavigation()
+              if (!this.navigationResult) {
                 this.props.setLoading(false)
                 Toast.show(
                   getLanguage().Navigation.PATH_ANALYSIS_FAILED,
@@ -385,13 +386,13 @@ export default class MapSelectButton extends React.Component<Props, State> {
               await SMap.getStartPoint(startPoint.x, startPoint.y, false)
               await SMap.getEndPoint(endPoint.x, startPoint.y, false)
               await SMap.startNavigation(navParams[0])
-              let canNav = await SMap.beginNavigation(
+              this.navigationResult = await SMap.beginNavigation(
                 startPoint.x,
                 startPoint.y,
                 doorPoint.x,
                 doorPoint.y,
               )
-              if (!canNav) {
+              if (!this.navigationResult) {
                 Toast.show(
                   '当前选点不在路网数据集范围内,请重新选点或者重设路网数据集',
                 )
@@ -427,13 +428,13 @@ export default class MapSelectButton extends React.Component<Props, State> {
           try {
             //设置室外导航相关参数，进行室外导航路径分析
             await SMap.startNavigation(commonOutdoorInfo[0])
-            let result = await SMap.beginNavigation(
+            this.navigationResult = await SMap.beginNavigation(
               startPoint.x,
               startPoint.y,
               endPoint.x,
               endPoint.y,
             )
-            if (result) {
+            if (this.navigationResult) {
               //室外路径分析成功 获取路径长度 路径信息
               pathLength = await SMap.getNavPathLength(false)
               path = await SMap.getPathInfos(false)
@@ -483,7 +484,7 @@ export default class MapSelectButton extends React.Component<Props, State> {
         if (startPoint) {
           let startFloorID = await SMap.getCurrentFloorID()
           TouchAction.setTouchStartFloorID(startFloorID)
-          TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_END)
+          TouchAction.setTouchMode(TouchMode.MAP_SELECT_END_POINT)
           this.setState({
             show: false,
           })
@@ -494,7 +495,7 @@ export default class MapSelectButton extends React.Component<Props, State> {
         if (endPoint) {
           let endFloorID = await SMap.getCurrentFloorID()
           TouchAction.setTouchEndFloorID(endFloorID)
-          TouchAction.setTouchMode(TouchMode.NORMAL)
+          TouchAction.setTouchMode(TouchMode.MAP_NAVIGATION)
           this.setState({
             show: true,
             button: getLanguage().Navigation.ROUTE_ANALYST,

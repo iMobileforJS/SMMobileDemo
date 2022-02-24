@@ -1,7 +1,6 @@
 import React from 'react'
-import { View, Text, Button } from 'react-native'
 import { SMMapView, SMap, FileTools, WorkspaceType } from 'imobile_for_reactnative'
-import { ConstOnline, ConstPath, DEFAULT_USER_NAME, TouchMode } from '@/constants'
+import { ConstPath, DEFAULT_USER_NAME, TouchMode } from '@/constants'
 import { Container } from '@/components'
 import { Props as HeaderProps } from '@/components/Header/Header'
 import ContainerType from '@/components/Container/Container'
@@ -88,7 +87,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
     this.mapController && this.mapController.setVisible(full)
     this.showFullMapAction(full)
 
-    this.fullMap = !isFull
+    this.fullMap = !full
   }
 
   /**
@@ -114,7 +113,6 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
       case TouchMode.NORMAL: {
         if (!(await TouchAction.isDoubleTouchComing())) {
           this.showFullMap(!this.fullMap)
-          this.fullMap = !this.fullMap
         }
         break
       }

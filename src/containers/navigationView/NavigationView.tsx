@@ -69,7 +69,6 @@ export default class NavigationView extends MapView<Props, State> {
       isResponseHeader: true,
     }
   }
-  
 
   /**
    * 设置楼层id
@@ -112,8 +111,9 @@ export default class NavigationView extends MapView<Props, State> {
         callback: async () => {},
       })
       SMap.setStopNavigationListener({
-        // callback: this._changeRouteCancel,
-        callback: () => {},
+        callback: () => {
+          this.clear()
+        },
       })
       SMap.setCurrentFloorIDListener({
         callback: currentFloorID => {
@@ -127,8 +127,8 @@ export default class NavigationView extends MapView<Props, State> {
   }
 
   componentWillUnmount() {
-    // await SMap.closeWorkspace()
     SMap.deleteGestureDetector()
+    SMap.stopGuide()
     this.clear()
   }
 
@@ -146,6 +146,7 @@ export default class NavigationView extends MapView<Props, State> {
   magntouchCallback = async (event: { LLPoint: Point }) => {
     switch (TouchAction.getTouchMode()) {
       case TouchMode.NORMAL:
+      case TouchMode.MAP_SELECT_START_POINT:
         await SMap.getStartPoint(event.LLPoint.x, event.LLPoint.y, false)
         TouchAction.setTouchStartPoint({
           x: event.LLPoint.x,
@@ -154,10 +155,11 @@ export default class NavigationView extends MapView<Props, State> {
         this.mapSelectButton?.setVisible(true, {
           button: getLanguage().Navigation.SET_AS_START_POINT,
         })
+        TouchAction.setTouchMode(TouchMode.MAP_SELECT_START_POINT)
         //全幅
-        this.showFullMap()
+        this.showFullMap(true)
         break
-      case TouchMode.NAVIGATION_TOUCH_END:
+      case TouchMode.MAP_SELECT_END_POINT:
         await SMap.getEndPoint(event.LLPoint.x, event.LLPoint.y, false)
         this.mapSelectButton?.setVisible(true, {
           button: getLanguage().Navigation.SET_AS_DESTINATION,
@@ -170,12 +172,33 @@ export default class NavigationView extends MapView<Props, State> {
     }
   }
 
-  clear = () => {
+  navigateAble = () => {
+    const startPoint = TouchAction.getTouchStartPoint()
+    const endPoint = TouchAction.getTouchEndPoint()
+    if (!startPoint) {
+      Toast.show('请选择起点')
+      return false
+    }
+    if (!endPoint) {
+      Toast.show('请选择终点')
+      return false
+    }
+    if (!this.mapSelectButton?.navigationResult) {
+      Toast.show('请分析路线')
+      return false
+    }
+    return true
+  }
+
+  /** 清除 */
+  clear = async () => {
     try {
-      SMap.removeAllCallout()
-      SMap.removePOICallout()
-      SMap.clearPoint()
+      await SMap.removeAllCallout()
+      await SMap.removePOICallout()
+      await SMap.clearPoint()
+      this.showFullMap(false)
       TouchAction.setTouchMode(TouchMode.NORMAL)
+      TouchAction.clearTouchPoints() // 清除起点/终点
     } catch (error) {
       
     }
@@ -223,8 +246,8 @@ export default class NavigationView extends MapView<Props, State> {
         getLayers={this.props.getLayers}
         device={this.props.device}
         incrementRoad={() => {
-          TouchAction.setTouchMode(TouchMode.NULL)//进入路网，触摸事件设置为空
           this.showFullMap(true)
+          TouchAction.setTouchMode(TouchMode.NULL)//进入路网，触摸事件设置为空
         }}
         mapLoaded={true}
         setLoading={this.setLoading}
@@ -249,7 +272,12 @@ export default class NavigationView extends MapView<Props, State> {
           image={getAssets().navigation.icon_navigation}
           title={'真实'}
           onPress={() => {
+            if (!this.navigateAble()) {
+              // 是否显示完成
+              return
+            }
             this.showFullMap(true)
+            TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_BEGIN)
             this.mapSelectButton?.setVisible(false)
             SMap.outdoorNavigation(0)
           }}
@@ -258,7 +286,11 @@ export default class NavigationView extends MapView<Props, State> {
           image={getAssets().navigation.dataset_type_else_black}
           title={'模拟'}
           onPress={() => {
+            if (!this.navigateAble()) {
+              return
+            }
             this.showFullMap(true)
+            TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_BEGIN)
             this.mapSelectButton?.setVisible(false)
             SMap.outdoorNavigation(1)
           }}
@@ -267,6 +299,7 @@ export default class NavigationView extends MapView<Props, State> {
           image={getAssets().mapTools.icon_location}
           title={'清除'}
           onPress={() => {
+            SMap.stopGuide()
             this.clear()
             this.mapSelectButton?.setVisible(false)
             Toast.show('长按选择起点')

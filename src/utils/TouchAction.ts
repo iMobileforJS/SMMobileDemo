@@ -56,7 +56,7 @@ function setTouchStartFloorID(floorID: string) {
  * @returns
  */
 function getTouchStartPoint() {
-  return startPoint || { x: 0, y: 0, floorID: '' }
+  return startPoint || null
 }
 
 /**
@@ -78,7 +78,7 @@ function setTouchEndFloorID(floorID: string) {
  * @returns
  */
 function getTouchEndPoint() {
-  return endPoint || { x: 0, y: 0, floorID: '' }
+  return endPoint || null
 }
 
 function clearTouchPoints() {
