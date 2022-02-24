@@ -1,23 +1,16 @@
 <h1 align="center">SuperMap Mobile Demo指南</h1>
 
-<h2>一. 安装</h2>
-
-<a herf="https://reactnative.cn/docs/environment-setup">React Native环境搭建</a>
-
-<h3>1. 创建项目</h3>
+<h3>一. 初始化Demo</h3>
+<h4>1. 安装三方库</h4>
 
 ```
-npx react-native init AwesomeProject --version X.XX.X
-```
+// 项目根目录执行以下命令
+npm install
 
-<h3>2. 必备三方库</h3>
-
+// 若某个三方库没有添加到Android工程中,则执行以下命令
+react-native link xxx(三方库名字)
 ```
-npm install react-native-reanimated react-native-gesture-handler react-native-screens react-native-safe-area-context @react-native-community/masked-view
-
-// ios 初始化安装必备三方库
-npx pod-install ios
-```
+<h4>2. Android权限及许可配置 </h4>
 
 ```xml
 // AndroidManifest.xml 添加许可(可根据实际使用功能,增删许可)
@@ -41,7 +34,7 @@ npx pod-install ios
 ```
 
 ```typescript
-// Android高版本需要动态申请权限,在js中调用
+// Android 6.0及其以上版本需要动态申请权限,在js中调用
 PermissionsAndroid.requestMultiple([
   'android.permission.READ_PHONE_STATE',
   'android.permission.READ_EXTERNAL_STORAGE',
@@ -50,16 +43,29 @@ PermissionsAndroid.requestMultiple([
 ```
 
 ```xml
+<application
+  <!-- 适配Android Q以上版本,文件储存闻之 -->
+  android:requestLegacyExternalStorage="true"
+>
+  <!-- 省略 -->
+</application>
+
 // AndroidManifest.xml 添加http
 <uses-library android:name="org.apache.http.legacy" android:required="false" />
 ```
 
-<h3>3. 引入imobile_for_reactnative</h3>
-将imobile_for_reactnative放入node_modules中</br>
-运行react-native link imobile_for_reactnative</br>
+<h4>3. 运行Demo</h4>
 
-</br></br>
-<h2>二. 使用imobile_for_reactnative</h2>
+1) 启动服务
+```
+// 项目根目录执行以下命令
+react-native start
+```
+2) 安装Demo
+使用Android Studio直接安装
+
+</br>
+<h3>二. 使用imobile_for_reactnative</h3>
 
 ```typescript
 import React from 'react'
@@ -72,6 +78,32 @@ export default MapView extends React.Component {
     // ...
     SMap.openMap(mapName)
     // ...
+  }
+
+  analystRoat = async () => {
+    try {
+      //添加起点，添加终点 设置室外导航参数 进行室外路径分析
+      await SMap.getStartPoint(startPoint.x, startPoint.y, false)
+      await SMap.getEndPoint(endPoint.x, startPoint.y, false)
+      await SMap.startNavigation(navParams[0])
+      const result = await SMap.beginNavigation(
+        startPoint.x,
+        startPoint.y,
+        doorPoint.x,
+        doorPoint.y,
+      )
+    } catch(e) {
+
+    }
+  }
+
+  navigate = () => {
+    try {
+      // 导航类型 0:真实导航 1:模拟导航
+      SMap.outdoorNavigation(1)
+    } catch(e) {
+
+    }
   }
 
   render() {
