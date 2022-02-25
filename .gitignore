@@ -53,7 +53,6 @@ buck-out/
 
 # Bundle artifact
 *.jsbundle
-
 .idea/
 .gradle/
 android/keystores/
@@ -68,6 +67,7 @@ android/app/src/main/assets/*.so
 android/app/src/main/assets/python_android_assets/*.so
 android/app/src/main/assets/python_android_assets/*PIL.zip
 android/app/src/main/assets/python_android_assets/*python2.7.zip
+android/app/src/main/assets/Navigation*
 
 ios/SuperMap.framework
 ios/Trial_License.slm
@@ -79,6 +79,7 @@ ios/iTablet-tvOS
 ios/iTablet-tvOSTests
 ios/Build
 ios/Index
+ios/assets/Navigation*
 package-lock.json
 yarn.lock
 .vscode/
@@ -130,6 +131,7 @@ android/local.properties
 .watchmanconfig
 
 bundles/
+bundle/
 ios/ZipArchive_2.framework/Headers/SSZipArchive.h
 ios/ZipArchive_2.framework/Headers/SSZipCommon.h
 ios/ZipArchive_2.framework/Headers/ZipArchive.h

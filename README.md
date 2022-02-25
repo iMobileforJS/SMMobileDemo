@@ -13,6 +13,10 @@ react-native link xxx(三方库名字)
 <h4>2. 下载imobile_for_reactnative aar包和示范数据 </h4>
 因aar包和示范数据过大,从云盘下载后,放入指定位置
 
+地址: <a herf="https://pan.baidu.com/s/1bbpyYoQD3Yb1NI7nWl_yDw">https://pan.baidu.com/s/1bbpyYoQD3Yb1NI7nWl_yDw </a>
+提取码: 4lv9
+
+
 1. Navigation_EXAMPLE.zip 放入/SMMobileDemo/android/app/src/main/assets/中
 2. imobile_for_reactnative.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中
 
