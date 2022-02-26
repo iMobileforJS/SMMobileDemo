@@ -18,7 +18,7 @@ react-native link xxx(三方库名字)
 
 
 1. Navigation_EXAMPLE.zip 放入/SMMobileDemo/android/app/src/main/assets/中
-2. 下载imobile_for_reactnative.aar 和 mediapipe_hand_tracking.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中
+2. 下载imobile_for_reactnative.aar 和 mediapipe_hand_tracking.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中(libs目录需用户创建）
 
 <h4>3. Android权限及许可配置 </h4>
 
@@ -72,8 +72,21 @@ PermissionsAndroid.requestMultiple([
 react-native start
 ```
 2) 安装Demo
-使用Android Studio直接安装
-
+1、使用Android Studio直接安装
+2、安装过程中若出现报错Execution failed for task ':app:validateSigningDebug'.
+可在工程命令行执行以下命令
+keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -validity 10000；
+密码在app/build/build.gradle中keyPassword;
+signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+    }
+}
+3、命令执行后在工程目录/android中生成文件debug.keystore，将该文件拷贝到工程/android/app下，再次运行即可
+4、运行后未正常申请权限，退出app重启即可
 </br>
 <h3>二. 使用imobile_for_reactnative进行导航示例</h3>
 
