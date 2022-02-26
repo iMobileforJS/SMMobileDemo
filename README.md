@@ -18,7 +18,7 @@ react-native link xxx(三方库名字)
 
 
 1. Navigation_EXAMPLE.zip 放入/SMMobileDemo/android/app/src/main/assets/中
-2. imobile_for_reactnative.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中
+2. 下载imobile_for_reactnative.aar 和 mediapipe_hand_tracking.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中
 
 <h4>3. Android权限及许可配置 </h4>
 
