@@ -5,7 +5,7 @@
 
 ```
 // 项目根目录执行以下命令
-yarn install 或 npm install
+yarn install(推荐) 或 npm install
 
 // 若某个三方库没有添加到Android工程中,则执行以下命令
 react-native link xxx(三方库名字)
