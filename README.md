@@ -76,7 +76,7 @@ react-native start
 <1>使用Android Studio直接安装
 
 <2>安装过程中若出现报错Execution failed for task ':app:validateSigningDebug'.
-可在工程命令行执行以下命令
+可在工程目录下命令行执行以下命令
 keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -validity 10000；
 
 密码在app/build/build.gradle中keyPassword;
@@ -90,7 +90,7 @@ signingConfigs {
     }
 }
 
-<3>命令执行后在工程目录/android中生成文件debug.keystore，将该文件拷贝到工程/android/app下，再次运行即可
+<3>命令执行后在工程目录中生成文件debug.keystore，将该文件拷贝到工程/android/app下，再次运行即可
 
 <4>运行后未正常申请权限，退出app重启即可
 </br>
