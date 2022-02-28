@@ -78,6 +78,8 @@ react-native start
 ```
 2) 安装Demo
 
+<b>注：Android版本请使用Android Studio 4.2及以上版本</b>
+
 <1>使用Android Studio直接安装
 
 <2>安装过程中若出现报错Execution failed for task ':app:validateSigningDebug'.
