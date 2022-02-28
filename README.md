@@ -10,9 +10,13 @@ yarn install(推荐) 或 npm install
 // 若某个三方库没有添加到Android工程中,则执行以下命令
 react-native link xxx(三方库名字)
 ```
+
 <h4>2. 下载imobile_for_reactnative aar包和示范数据 </h4>
+
 因aar包和示范数据过大,从云盘下载后,放入指定位置
+
 地址: <a herf="https://pan.baidu.com/s/1V9S3j6eL0-qvyVYrZHCTYw">https://pan.baidu.com/s/1V9S3j6eL0-qvyVYrZHCTYw</a>
+
 提取码: 6xzc
 
 
