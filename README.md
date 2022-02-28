@@ -69,7 +69,7 @@ PermissionsAndroid.requestMultiple([
 <uses-library android:name="org.apache.http.legacy" android:required="false" />
 ```
 
-<h4>4. 运行Demo（推荐使用最先版本Android Studio）</h4>
+<h4>4. 运行Demo </h4>
 
 1) 启动服务
 ```
