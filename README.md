@@ -10,11 +10,14 @@ yarn install(推荐) 或 npm install
 // 若某个三方库没有添加到Android工程中,则执行以下命令
 react-native link xxx(三方库名字)
 ```
+
 <h4>2. 下载imobile_for_reactnative aar包和示范数据 </h4>
+
 因aar包和示范数据过大,从云盘下载后,放入指定位置
 
-地址: <a herf="https://pan.baidu.com/s/1bbpyYoQD3Yb1NI7nWl_yDw">https://pan.baidu.com/s/1bbpyYoQD3Yb1NI7nWl_yDw </a>
-提取码: 4lv9
+地址: <a herf="https://pan.baidu.com/s/1V9S3j6eL0-qvyVYrZHCTYw">https://pan.baidu.com/s/1V9S3j6eL0-qvyVYrZHCTYw</a>
+
+提取码: 6xzc
 
 
 1. Navigation_EXAMPLE.zip 放入/SMMobileDemo/android/app/src/main/assets/中
@@ -24,14 +27,16 @@ react-native link xxx(三方库名字)
 
 ```xml
 // AndroidManifest.xml 添加许可(可根据实际使用功能,增删许可)
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.REORDER_TASKS" />
-<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+// 注：文件读取权限、手机状态权限、网络权限为必须（以下4项）
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+
+<uses-permission android:name="android.permission.REORDER_TASKS" />
+<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -64,7 +69,7 @@ PermissionsAndroid.requestMultiple([
 <uses-library android:name="org.apache.http.legacy" android:required="false" />
 ```
 
-<h4>4. 运行Demo（推荐使用最先版本Android Studio）</h4>
+<h4>4. 运行Demo </h4>
 
 1) 启动服务
 ```
@@ -72,6 +77,8 @@ PermissionsAndroid.requestMultiple([
 react-native start
 ```
 2) 安装Demo
+
+<b>注：Android版本请使用Android Studio 4.2及以上版本</b>
 
 <1>使用Android Studio直接安装
 
