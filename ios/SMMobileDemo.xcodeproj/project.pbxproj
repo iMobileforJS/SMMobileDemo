@@ -186,13 +186,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E187B4527CF5E900059BF37 /* SuperMap.framework in Frameworks */,
 				0A44180527CE1C8900DDF353 /* libSupermap.a in Frameworks */,
 				0A4417E427CE1BCC00DDF353 /* Contacts.framework in Frameworks */,
 				0A4417E027CE1BB500DDF353 /* CocoaAsyncSocket.framework in Frameworks */,
 				0A4417DA27CE1B9100DDF353 /* AddressBook.framework in Frameworks */,
 				0A44180B27CE1C9F00DDF353 /* OpenGLES.framework in Frameworks */,
 				0A44180927CE1C9800DDF353 /* MobileCoreServices.framework in Frameworks */,
-				0A4417FD27CE1C3800DDF353 /* libAsHttpRequest.a in Frameworks */,
 				0A4417EC27CE1BE800DDF353 /* CoreTelephony.framework in Frameworks */,
 				0A4417E827CE1BDC00DDF353 /* CoreLocation.framework in Frameworks */,
 				0A44180D27CE1CA600DDF353 /* QuartzCore.framework in Frameworks */,
@@ -200,26 +200,26 @@
 				0A44180F27CE1CB500DDF353 /* RMQClient.framework in Frameworks */,
 				49FABE331317A6D534997ACF /* libPods-SMMobileDemo.a in Frameworks */,
 				0A44182027CE1D8D00DDF353 /* GLTFSceneKit.framework in Frameworks */,
-				0A4417FE27CE1C3800DDF353 /* libflyMSC.a in Frameworks */,
-				0A4417FC27CE1C3800DDF353 /* libCorePlot.a in Frameworks */,
 				0A4417E627CE1BD500DDF353 /* CoreGraphics.framework in Frameworks */,
-				4E187B4527CF5E900059BF37 /* SuperMap.framework in Frameworks */,
-				0A44180227CE1C6900DDF353 /* libiconv.2.4.0.tbd in Frameworks */,
 				0A44181427CE1CE300DDF353 /* SystemConfiguration.framework in Frameworks */,
 				0A44181227CE1CD700DDF353 /* Security.framework in Frameworks */,
 				0A44181827CE1CEE00DDF353 /* WebKit.framework in Frameworks */,
-				0A44180427CE1C7C00DDF353 /* libicucore.A.tbd in Frameworks */,
-				0A4417FB27CE1C3700DDF353 /* libSocketRocket.a in Frameworks */,
 				0A4417EE27CE1BF000DDF353 /* CoreText.framework in Frameworks */,
 				0A44181627CE1CE900DDF353 /* UIKit.framework in Frameworks */,
 				0A4417DE27CE1BA000DDF353 /* AVFoundation.framework in Frameworks */,
 				0A4417F527CE1C0B00DDF353 /* JRE.framework in Frameworks */,
-				0A44180027CE1C5100DDF353 /* libstdc++.6.0.9.tbd in Frameworks */,
 				0A4417F227CE1BFF00DDF353 /* JKVValue.framework in Frameworks */,
 				0A4417D827CE1B8B00DDF353 /* Accelerate.framework in Frameworks */,
 				0A4417DC27CE1B9A00DDF353 /* AudioToolbox.framework in Frameworks */,
 				0A44180727CE1C9000DDF353 /* MediaPlayer.framework in Frameworks */,
 				0A4417F027CE1BF700DDF353 /* ExternalAccessory.framework in Frameworks */,
+				0A4417FD27CE1C3800DDF353 /* libAsHttpRequest.a in Frameworks */,
+				0A4417FC27CE1C3800DDF353 /* libCorePlot.a in Frameworks */,
+				0A4417FE27CE1C3800DDF353 /* libflyMSC.a in Frameworks */,
+				0A4417FB27CE1C3700DDF353 /* libSocketRocket.a in Frameworks */,
+				0A44180427CE1C7C00DDF353 /* libicucore.A.tbd in Frameworks */,
+				0A44180227CE1C6900DDF353 /* libiconv.2.4.0.tbd in Frameworks */,
+				0A44180027CE1C5100DDF353 /* libstdc++.6.0.9.tbd in Frameworks */,
 				0A4418B127CE41B500DDF353 /* ZipArchive.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -763,6 +763,49 @@
 			baseConfigurationReference = EB1E3349829652F1D1F4C6FD /* Pods-SMMobileDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_MODULES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = URZW253WPZ;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/iPhoneOS.sdk",
+					"$(PROJECT_DIR)",
+				);
+				INFOPLIST_FILE = SMMobileDemo/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/iPhoneOS",
+					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib",
+					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A",
+				);
+				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = SMMobileDemo;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Debug;
+		};
+		13B07F951A680F5B00A75B9A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5C2A6BDA8918E2315B6D60DC /* Pods-SMMobileDemo.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = URZW253WPZ;
@@ -784,45 +827,7 @@
 					"$(PROJECT_DIR)/iPhoneOS",
 					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-ObjC",
-					"-lc++",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = SMMobileDemo;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
-		};
-		13B07F951A680F5B00A75B9A /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5C2A6BDA8918E2315B6D60DC /* Pods-SMMobileDemo.release.xcconfig */;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = URZW253WPZ;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/iPhoneOS.sdk",
-					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/MessageQueue.sdk",
-				);
-				INFOPLIST_FILE = SMMobileDemo/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib",
-					"$(PROJECT_DIR)/iPhoneOS",
-					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A",
-				);
+				OTHER_CODE_SIGN_FLAGS = "--generate-entitlement-der";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -832,6 +837,7 @@
 				PRODUCT_NAME = SMMobileDemo;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
