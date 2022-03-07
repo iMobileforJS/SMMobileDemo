@@ -7,6 +7,10 @@
 // 项目根目录执行以下命令
 yarn install(推荐) 或 npm install
 
+// for iOS
+npm install -g npx (已安装npx可跳过)
+npx pod-install ios
+
 // 若某个三方库没有添加到Android工程中,则执行以下命令
 react-native link xxx(三方库名字)
 ```
@@ -19,12 +23,18 @@ react-native link xxx(三方库名字)
 
 提取码: 6xzc
 
-
+<b>for Android:</b>
 1. Navigation_EXAMPLE.zip 放入/SMMobileDemo/android/app/src/main/assets/中
 2. 下载imobile_for_reactnative.aar 和 mediapipe_hand_tracking.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中(libs目录需用户创建）
 
-<h4>3. Android权限及许可配置 </h4>
+<b>for iOS:</b>
+1. Navigation_EXAMPLE.zip 解压后放入/SMMobileDemo/ios/assets/中
 
+<h4>3. 项目配置 </h4>
+
+<b>for Android:</b>
+
+Android权限及许可配置
 ```xml
 // AndroidManifest.xml 添加许可(可根据实际使用功能,增删许可)
 // 注：文件读取权限、手机状态权限、网络权限为必须（以下4项）
@@ -69,6 +79,20 @@ PermissionsAndroid.requestMultiple([
 <uses-library android:name="org.apache.http.legacy" android:required="false" />
 ```
 
+<b>for iOS:</b>
+```objc
+// AppDelegate.m
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
+#if DEBUG
+  [[RCTBundleURLProvider sharedSettings] setJsLocation:@"xxx.xxx.xxx.xxx"]; // 本地IP,用于Debug调试
+  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+#else
+  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+#endif
+}
+```
+
 <h4>4. 运行Demo </h4>
 
 1) 启动服务
@@ -88,6 +112,7 @@ keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -
 
 密码在app/build/build.gradle中keyPassword;
 
+```
 signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -96,6 +121,7 @@ signingConfigs {
             keyPassword 'android'
     }
 }
+```
 
 <3>命令执行后在工程目录中生成文件debug.keystore，将该文件拷贝到工程/android/app下，再次运行即可
 

@@ -1,6 +1,6 @@
 import Home from './home';
 import MapView from './mapView';
-import NavigationView from './navigationView';
+import NavigationView from './navigationModel';
 
 export {
   Home,

@@ -140,3 +140,5 @@ ios/ZipArchive_2.framework/Modules/module.modulemap
 ios/ZipArchive_2.framework/ZipArchive
 configs/mapFunctionModules/Tour/*
 configs/mapModules/TourModule.js
+
+ios/assets/SuperMap.bundle

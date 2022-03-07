@@ -6,19 +6,19 @@ import android.os.Handler;
 
 import java.util.Stack;
 
-public class appManager {
+public class AppManager {
     private static Stack<Activity> activityStack;
-    private static appManager instance;
+    private static AppManager instance;
 
-    private appManager() {
+    private AppManager() {
     }
 
     /**
      * 单一实例
      */
-    public static appManager getAppManager() {
+    public static AppManager getAppManager() {
         if (instance == null) {
-            instance = new appManager();
+            instance = new AppManager();
         }
         return instance;
     }

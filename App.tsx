@@ -18,7 +18,7 @@ import {
   View,
   Button,
 } from 'react-native';
-import { SMap, AppInfo, FileTools, SLocation } from 'imobile_for_reactnative'
+import { SMap, AppInfo, FileTools, SLocation, WorkspaceType } from 'imobile_for_reactnative'
 import Root from '@/Root'
 import { ConstPath, DEFAULT_USER_NAME, DEFAULT_LANGUAGE } from '@/constants'
 import Orientation from 'react-native-orientation'
@@ -45,7 +45,7 @@ class AppRoot extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      isInit: 'permission',
+      isInit: Platform.OS === 'ios' ? 'done' : 'permission',
     }
   }
 
@@ -102,7 +102,7 @@ class AppRoot extends React.Component<Props, State> {
     try {
       this.Loading?.setLoading(true, '初始化中')
       this.initOrientation()
-      await SMap.setPermisson(true) // 权限申请
+      Platform.OS === 'android' && await SMap.setPermisson(true) // 权限申请
       await this.initEnvironment() // 初始化环境
       await SMap.initMapView() // 初始化唯一地图组件
       await SMap.setCurrentModule(255) // 设置模块权限
@@ -113,19 +113,15 @@ class AppRoot extends React.Component<Props, State> {
       if (!result) {
         await SMap.activateLicense('') // 许可激活码 xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
       }
-      if (Platform.OS === 'android') {
-        // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
-        const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
-        await AppUtils.copyAssetFileToSDcard('Navigation_EXAMPLE.zip', toPath)
+      // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
+      const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
+      await AppUtils.copyAssetFileTo('Navigation_EXAMPLE.zip', toPath)
 
-        this.setState({
-          isInit: 'done',
-        }, () => {
-          this.Loading?.setLoading(false)
-        })
-      } else {
+      this.setState({
+        isInit: 'done',
+      }, () => {
         this.Loading?.setLoading(false)
-      }
+      })
       Toast.show(result ? '激活成功' : '激活失败')
     } catch (error) {
       this.Loading?.setLoading(false)
@@ -187,6 +183,11 @@ class AppRoot extends React.Component<Props, State> {
    */
   openWorkspace = async () => {
     try {
+      const home = await FileTools.appendingHomeDirectory()
+
+      // const path = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/DefaultData/Workspace/Workspace.sxwu`
+      // const path = `${home + ConstPath.ExternalData}/Navigation_EXAMPLE/beijing.smwu`
+      // const path = `${home + ConstPath.ExternalData}/kk/kk.smwu`
       let wsPath = ConstPath.CustomerPath + ConstPath.RelativeFilePath.Workspace[DEFAULT_LANGUAGE], path = await FileTools.getHomeDirectory() + wsPath
 
       if (await FileTools.fileIsExist(path)) {

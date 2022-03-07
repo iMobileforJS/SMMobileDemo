@@ -1,6 +1,6 @@
 import React from 'react'
 import { SMMapView, SMap, FileTools, WorkspaceType } from 'imobile_for_reactnative'
-import { ConstPath, DEFAULT_USER_NAME, TouchMode } from '@/constants'
+import { ConstPath, DEFAULT_USER_NAME, TouchMode, DEFAULT_LANGUAGE } from '@/constants'
 import { Container } from '@/components'
 import { Props as HeaderProps } from '@/components/Header/Header'
 import ContainerType from '@/components/Container/Container'
@@ -30,12 +30,24 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
   }
 
   componentWillUnmount() {
-    // await SMap.closeWorkspace()
     SMap.deleteGestureDetector()
   }
 
   _onGetInstance = () => {
     this._addMap()
+  }
+  openWorkspace = async () => {
+    try {
+      let wsPath = ConstPath.CustomerPath + ConstPath.RelativeFilePath.Workspace[DEFAULT_LANGUAGE], path = await FileTools.getHomeDirectory() + wsPath
+
+      let result = false
+      if (await FileTools.fileIsExist(path)) {
+        result = await SMap.openWorkspace({ server: path })
+      }
+      return result
+    } catch(e) {
+      console.warn('openWorkspace error')
+    }
   }
 
   /** 加载地图，mapview加载完成后调用 */
@@ -65,11 +77,11 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
           name: 'beijing',
           path: mapPath,
         })
-        // await SMap.openDatasource(ConstOnline.TrafficMap.DSParams, ConstOnline.TrafficMap.layerIndex, false)
         // 获取地图信息
         const mapInfo2 = await SMap.getMapInfo()
       }
 
+      this.addMap()
       // SMap.viewEntire()
     } catch(e) {
 
@@ -146,10 +158,6 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
             : 0,
       },
       backAction: event => {
-        // this.backPositon = {
-        //   x: event.nativeEvent.pageX,
-        //   y: event.nativeEvent.pageY,
-        // }
         return this.back()
       },
       type: 'fix',

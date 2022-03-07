@@ -7,7 +7,7 @@ import { scaleSize, TouchAction, Toast } from "@/utils";
 import { Props as HeaderProps } from "@/components/Header/Header";
 import { TrafficView, MapSelectButton } from './components';
 import { TouchMode } from '@/constants';
-import { SMap } from 'imobile_for_reactnative';
+import { SMap, CustomTools } from 'imobile_for_reactnative';
 import { EmitterSubscription, View } from 'react-native';
 import { MapViewProps } from '../mapView/types';
 import { getLanguage } from '@/language';
@@ -23,7 +23,7 @@ type State = {
   // currentFloorID: string,
 }
 
-export default class NavigationView extends MapView<Props, State> {
+export default class CollectionView extends MapView<Props, State> {
 
   trafficView: TrafficView | undefined | null
   floorHiddenListener: EmitterSubscription | undefined | null
@@ -134,9 +134,10 @@ export default class NavigationView extends MapView<Props, State> {
 
   addMap = async () => {
     try {
-      SMap.getCurrentFloorID().then(currentFloorID => {
-        this.changeFloorID(currentFloorID)
-      })
+      // SMap.getCurrentFloorID().then(currentFloorID => {
+      //   this.changeFloorID(currentFloorID)
+      // })
+      // 初始化导航语音
       SMap.initSpeakPlugin()
     } catch (error) {
       
@@ -303,6 +304,16 @@ export default class NavigationView extends MapView<Props, State> {
             this.clear()
             this.mapSelectButton?.setVisible(false)
             Toast.show('长按选择起点')
+            CustomTools.clearMapCallout('')
+          }}
+        />
+        <ImageButton
+          image={getAssets().mapTools.icon_location}
+          title={'中心点'}
+          onPress={async () => {
+            const point = await SMap.getMapCenter()
+            console.warn(point)
+            CustomTools.addMapCallout(point.x, point.y, '')
           }}
         />
       </View>

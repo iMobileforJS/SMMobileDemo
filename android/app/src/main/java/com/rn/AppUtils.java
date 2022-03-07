@@ -1,10 +1,7 @@
 package com.rn;
 
-import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -15,14 +12,9 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.supermap.RNUtils.AppInfo;
 import com.supermap.RNUtils.FileTools;
 import com.supermap.RNUtils.Utils;
-import com.supermap.containts.EventConst;
 import com.supermap.interfaces.utils.SLocation;
-
-import java.util.Locale;
 
 public class AppUtils extends ReactContextBaseJavaModule {
     private static ReactContext mReactContext;
@@ -38,10 +30,14 @@ public class AppUtils extends ReactContextBaseJavaModule {
         return "AppUtils";
     }
     @ReactMethod
-    public void AppExit(){
-        SLocation.closeGPS();
-        appManager.getAppManager().AppExit(getReactApplicationContext());
-
+    public void AppExit(Promise promise){
+        try {
+            SLocation.closeGPS();
+            AppManager.getAppManager().AppExit(getReactApplicationContext());
+            promise.resolve(true);
+        } catch (Exception e) {
+            promise.resolve(false);
+        }
     }
 
     @ReactMethod
@@ -90,7 +86,7 @@ public class AppUtils extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void copyAssetFileToSDcard(String fileName, String toPath, Promise promise) {
+    public void copyAssetFileTo(String fileName, String toPath, Promise promise) {
         try {
             String originName = fileName;
             String defaultDataZip = fileName;
@@ -104,92 +100,6 @@ public class AppUtils extends ReactContextBaseJavaModule {
         } catch (Exception e) {
             promise.resolve(false);
         }
-    }
-
-    private  boolean is64bitCPU() {
-        String CPU_ABI = null;
-        try {
-            if (Build.VERSION.SDK_INT >= 23) {
-                return android.os.Process.is64Bit();
-            } else {
-                return false;
-            }
-        }catch (Exception e) {
-            return false;
-        }
-    }
-
-    @ReactMethod
-    public void is64Bit(Promise promise) {
-        try {
-            Boolean res =  is64bitCPU();//
-            promise.resolve(res);
-        } catch (Exception e) {
-            promise.resolve(false);
-        }
-    }
-
-     @ReactMethod
-     public void getLocale(Promise promise) {
-        try {
-            Locale locale = Locale.getDefault();
-            String language = locale.getLanguage();
-            String contry = locale.getCountry();
-            promise.resolve(language + '-'+ contry);
-        } catch (Exception e) {
-            promise.resolve("");
-        }
-     }
-
-    @ReactMethod
-    public void isLocationOpen(Promise promise) {
-        LocationManager locationManager = (LocationManager) mReactContext.getSystemService(Context.LOCATION_SERVICE);
-        promise.resolve(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
-    }
-
-
-    @ReactMethod
-    public void startAppLoactionSetting(Promise promise) {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        try{
-            mReactContext.startActivity(intent);
-            promise.resolve(true);
-        } catch (ActivityNotFoundException e1){
-            intent .setAction(Settings.ACTION_SETTINGS);
-            try{
-                mReactContext.startActivity(intent);
-                promise.resolve(true);
-            } catch (Exception e2) {
-                promise.resolve(false);
-            }
-        }
-
-    }
-
-    @ReactMethod
-    public void pause (int time, Promise promise){
-        try {
-            final int timeInMS = time * 1000;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(timeInMS);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    promise.resolve(true);
-                }
-            }).start();
-        }catch (Exception e){
-            promise.resolve(false);
-        }
-    }
-
-    public static void sendShareResult(String result) {
-        mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(EventConst.MESSAGE_SHARERESULT, result);
     }
 
 }
