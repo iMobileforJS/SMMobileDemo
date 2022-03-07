@@ -10,8 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CLLocationManager.h>
 #import "AppDelegate.h"
-//#import <SMSupermap/FileTools.h>
-//#import "FileTools.h"
+#import "FileTools.h"
 
 @implementation AppUtils
 RCT_EXPORT_MODULE();
@@ -32,21 +31,22 @@ RCT_REMAP_METHOD(AppExit,AppExit:(RCTPromiseResolveBlock)resolve rejecter:(RCTPr
 
 RCT_REMAP_METHOD(copyAssetFileTo, copyAssetFileTo:(NSString *)fileName toPath:(NSString *)toPath resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject){
   @try {
-//    NSString* name = fileName;
-//    if ([fileName hasSuffix:@".zip"]) {
-//      name = [fileName stringByDeletingPathExtension];
-//    }
-//    NSString* srclic = [[NSBundle mainBundle] pathForResource:name ofType:@"zip"];
-//    if (srclic) {
-//      [FileTools createFileDirectories:toPath];
-//      if (![FileTools unZipFile:srclic targetPath:toPath]) {
-//        NSLog(@"拷贝数据失败");
-//        resolve(@(NO));
-//      } else {
-//        resolve(@(YES));
-//      }
-//    }
-    resolve(@(YES));
+    NSString* name = fileName;
+    if ([fileName hasSuffix:@".zip"]) {
+      name = [fileName stringByDeletingPathExtension];
+    }
+    NSString* srclic = [[NSBundle mainBundle] pathForResource:name ofType:@"zip"];
+    if (srclic) {
+      [FileTools createFileDirectories:toPath];
+      if (![FileTools unZipFile:srclic targetPath:toPath]) {
+        NSLog(@"拷贝数据失败");
+        resolve(@(NO));
+      } else {
+        resolve(@(YES));
+      }
+    } else {
+      resolve(@(YES));
+    }
   } @catch (NSException *exception) {
     resolve(@(NO));
   }
