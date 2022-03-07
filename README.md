@@ -1,21 +1,29 @@
 <h1 align="center">SuperMap Mobile Demo指南</h1>
 
 <h3>一. 初始化Demo</h3>
-<h4>1. 安装三方库</h4>
+<h4>1. 下载</h4>
+```
+git clone https://github.com/iMobileforJS/SMMobileDemo.git
+```
+<h4>2. 初始化项目</h4>
 
 ```
 // 项目根目录执行以下命令
-yarn install(推荐) 或 npm install
+// react-native使用最新版本,可能会和其他三方库版本不匹配导致npm install失败,推荐使用yarn install
+yarn install
 
 // for iOS
 npm install -g npx (已安装npx可跳过)
+// pod install时间可能比较久,或因超时失败,可多次尝试
 npx pod-install ios
+// 或到SMMobileDemo/ios目录中运行
+pod install
 
-// 若某个三方库没有添加到Android工程中,则执行以下命令
+// 若某个三方库没有添加到Android工程中,则执行以下命令(可跳过)
 react-native link xxx(三方库名字)
 ```
 
-<h4>2. 下载imobile_for_reactnative aar包和示范数据 </h4>
+<h4>3. 下载imobile_for_reactnative相关包和示范数据 </h4>
 
 因aar包和示范数据过大,从云盘下载后,放入指定位置
 
@@ -28,9 +36,10 @@ react-native link xxx(三方库名字)
 2. 下载imobile_for_reactnative.aar 和 mediapipe_hand_tracking.aar 放入/SMMobileDemo/node_modules/imobile_for_reactnative/android/libs/中(libs目录需用户创建）
 
 <b>for iOS:</b>
-1. Navigation_EXAMPLE.zip 解压后放入/SMMobileDemo/ios/assets/中
+1. Navigation_EXAMPLE.zip, SuperMap.bundle 解压后放入/SMMobileDemo/ios/assets/中
+2. iPhoneOS.sdk 解压后放入/SMMobileDemo/ios/
 
-<h4>3. 项目配置 </h4>
+<h4>4. 项目配置 </h4>
 
 <b>for Android:</b>
 
@@ -93,7 +102,7 @@ PermissionsAndroid.requestMultiple([
 }
 ```
 
-<h4>4. 运行Demo </h4>
+<h4>5. 运行Demo </h4>
 
 1) 启动服务
 ```
