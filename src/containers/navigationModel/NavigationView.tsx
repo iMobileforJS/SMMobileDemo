@@ -297,7 +297,7 @@ export default class NavigationView extends MapView<Props, State> {
           }}
         />
         <ImageButton
-          image={getAssets().mapTools.icon_location}
+          image={getAssets().mapTools.icon_delete}
           title={'清除'}
           onPress={() => {
             SMap.stopGuide()

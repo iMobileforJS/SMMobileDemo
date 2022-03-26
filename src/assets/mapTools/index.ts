@@ -2,9 +2,10 @@ const icon_enlarge = require('./icon_enlarge.png')
 const icon_narrow = require('./icon_narrow.png')
 const icon_location = require('./icon_location.png')
 const icon_path_analysis = require('./icon_path_analysis.png')
-const icon_input_clear = require('./icon_path_analysis.png')
+const icon_input_clear = require('./icon_input_clear.png')
 const icon_search = require('./icon_search.png')
 const icon_scene_position = require('./icon_scene_position.png')
+const icon_delete = require('./icon_tool_delete.png')
 
 export default {
   icon_enlarge,
@@ -14,4 +15,5 @@ export default {
   icon_input_clear,
   icon_search,
   icon_scene_position,
+  icon_delete,
 }
