@@ -8,6 +8,7 @@ import { MapController } from './components'
 import { scaleSize, TouchAction } from '@/utils'
 import { Extra } from '@/components/Container/Loading'
 import { MapViewProps } from './types'
+import { DEFAULT_DATA, DEFAULT_DATA_WORKSPACE, DEFAULT_DATA_MAP } from '../../config'
 
 type State = {
   currentFloorID: string,
@@ -55,10 +56,8 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
     try {
       const home = await FileTools.appendingHomeDirectory()
 
-      const exampleMapName = 'beijing'
-
-      const path = `${home + ConstPath.ExternalData}/Navigation_EXAMPLE/${exampleMapName}.smwu`
-      const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map + exampleMapName}.xml`
+      const path = `${home + ConstPath.ExternalData}/${DEFAULT_DATA}/${DEFAULT_DATA_WORKSPACE}.smwu`
+      const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map + DEFAULT_DATA_MAP}.xml`
 
       const data = {
         server: path,
@@ -74,7 +73,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
       if (result) {
         // 打开地图
         let mapInfo = await this.props.openMap({
-          name: 'beijing',
+          name: DEFAULT_DATA_MAP,
           path: mapPath,
         })
         // 获取地图信息

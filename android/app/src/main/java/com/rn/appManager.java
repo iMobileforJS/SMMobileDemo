@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import java.util.Stack;
 
-public class AppManager {
+class AppManager {
     private static Stack<Activity> activityStack;
     private static AppManager instance;
 

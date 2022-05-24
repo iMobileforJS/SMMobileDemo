@@ -26,6 +26,7 @@ import { setShow } from '@/redux/reducers/device'
 import { Toast } from '@/utils';
 import { Dialog } from '@/components';
 import Loading from '@/components/Container/Loading';
+import { DEFAULT_DATA } from './src/config'
 let AppUtils = NativeModules.AppUtils
 
 interface Props {
@@ -115,7 +116,7 @@ class AppRoot extends React.Component<Props, State> {
       }
       // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
       const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
-      await AppUtils.copyAssetFileTo('Navigation_EXAMPLE.zip', toPath)
+      await AppUtils.copyAssetFileTo(`${DEFAULT_DATA}.zip`, toPath)
 
       this.setState({
         isInit: 'done',
