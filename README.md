@@ -39,6 +39,21 @@ react-native link xxx(三方库名字)
 1. Navigation_EXAMPLE.zip, SuperMap.bundle 解压后放入/SMMobileDemo/ios/assets/中
 2. iPhoneOS.sdk 解压后放入/SMMobileDemo/ios/
 
+注：如果需要替换自有数据，可以在项目工程“config.ts”,替换数据名、工作空间、以及地图名。如下格式：
+``` javascript
+/** 默认导航示范地图包名 */
+const DEFAULT_DATA = 'Navigation_EXAMPLE'
+/** 默认导航示范地图工作空间名 */
+const DEFAULT_DATA_WORKSPACE = 'beijing'
+/** 默认导航示范地图名 */
+const DEFAULT_DATA_MAP = 'beijing'
+
+export {
+    DEFAULT_DATA,
+    DEFAULT_DATA_WORKSPACE,
+    DEFAULT_DATA_MAP,
+}
+```
 <h4>4. 项目配置 </h4>
 
 <b>for Android:</b>
