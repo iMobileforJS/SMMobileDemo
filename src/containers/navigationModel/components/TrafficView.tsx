@@ -20,7 +20,7 @@ import { Extra } from '@/components/Container/Loading'
 
 interface Props {
   device: Device,
-  getLayers: () => Promise<SMap.LayerInfo[]>,
+  getLayers: () => Promise<SMap.LayerInfo[] | null> ,
   incrementRoad: () => void,
   setLoading?: (loading: boolean, info?: string, extra?: Extra) => void,
   mapLoaded: boolean,
@@ -98,15 +98,17 @@ export default class TrafficView extends React.Component<Props, State> {
         await SMap.removeTrafficMap('tencent@TrafficMap')
       } else {
         let layers = await this.props.getLayers()
-        let baseMap = layers.filter(layer =>
-          LayerUtils.isBaseLayer(layer),  
-        )[0]
-        if (
-          baseMap &&
-          baseMap.name !== 'baseMap' &&
-          baseMap.isVisible
-        ) {
-          await SMap.openTrafficMap(ConstOnline.TrafficMap.DSParams)
+        if(layers){
+          let baseMap = layers.filter(layer =>
+            LayerUtils.isBaseLayer(layer),  
+          )[0]
+          if (
+            baseMap &&
+            baseMap.name !== 'baseMap' &&
+            baseMap.isVisible
+          ) {
+            await SMap.openTrafficMap(ConstOnline.TrafficMap.DSParams)
+          }
         }
       }
       let hasAdded = !this.state.hasAdded

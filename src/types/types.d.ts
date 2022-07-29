@@ -56,4 +56,11 @@ declare interface TouchMode {
 
   // 地图选点监听
   MAP_SELECT_POINT: 'MAP_SELECT_POINT',
+
+  // 地图浏览-添加点
+  MAP_CREATE_POINT: 'MAP_CREATE_POINT',
+  // 地图浏览-添加线
+  MAP_CREATE_LINE: 'MAP_CREATE_LINE',
+  // 地图浏览-添加面
+  MAP_CREATE_REGION: 'MAP_CREATE_REGION',
 }
