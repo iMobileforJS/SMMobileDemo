@@ -193,16 +193,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   largeImage: {
-    height: scaleSize(65),
-    width: scaleSize(65),
+    height: scaleSize(45),
+    width: scaleSize(45),
   },
   normalImage: {
-    height: scaleSize(60),
-    width: scaleSize(60),
+    height: scaleSize(50),
+    width: scaleSize(50),
   },
   smallImage: {
-    height: scaleSize(55),
-    width: scaleSize(55),
+    height: scaleSize(45),
+    width: scaleSize(45),
   },
   largeText: {
     fontSize: size.fontSize.fontSizeMd,

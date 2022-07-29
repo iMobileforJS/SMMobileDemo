@@ -1,3 +1,4 @@
+/** 地图导航界面的样式文件 */
 import { StyleSheet } from 'react-native'
 import { scaleSize } from '@/utils'
 import { color } from '@/styles'

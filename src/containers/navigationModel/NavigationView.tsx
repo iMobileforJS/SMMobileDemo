@@ -1,22 +1,28 @@
 /**
  * 地图导航界面
+ * 结构：
+ *   index：地图导航的入口文件
+ *   NavigationView：地图导航的界面结构和渲染
+ *   styles：地图导航界面的样式
+ *   component文件夹: 里面放地图导航界面的相关组件
  */
 import React from 'react'
 import MapView from "../mapView/MapView";
 import { scaleSize, TouchAction, Toast } from "@/utils";
 import { Props as HeaderProps } from "@/components/Header/Header";
 import { TrafficView, MapSelectButton } from './components';
-import { TouchMode } from '@/constants';
-import { SMap, CustomTools } from 'imobile_for_reactnative';
+import { ConstPath, DEFAULT_USER_NAME, TouchMode } from '@/constants';
+import { SMap, CustomTools, FileTools, WorkspaceType } from 'imobile_for_reactnative';
 import { EmitterSubscription, View } from 'react-native';
 import { MapViewProps } from '../mapView/types';
 import { getLanguage } from '@/language';
 import { ImageButton } from '@/components'
 import { getAssets } from '@/assets'
 import styles from './styles'
+import { DEFAULT_DATA, DEFAULT_DATA_MAP, DEFAULT_DATA_WORKSPACE } from '@/config';
 
 type Props = {
-  getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
+  // getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
 }
 
 type State = {
@@ -50,7 +56,7 @@ export default class NavigationView extends MapView<Props, State> {
             ? scaleSize(96)
             : 0,
       },
-      backAction: event => {
+      backAction: () => {
         // this.backPositon = {
         //   x: event.nativeEvent.pageX,
         //   y: event.nativeEvent.pageY,
@@ -134,6 +140,14 @@ export default class NavigationView extends MapView<Props, State> {
 
   addMap = async () => {
     try {
+
+      const home = await FileTools.appendingHomeDirectory()
+
+      const path = `${home + ConstPath.ExternalData}/${DEFAULT_DATA}/${DEFAULT_DATA_WORKSPACE}.smwu`
+      const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map + DEFAULT_DATA_MAP}.xml`
+      this.changeMap(true, false, {name: DEFAULT_DATA_MAP,path: mapPath}, path)
+
+
       // SMap.getCurrentFloorID().then(currentFloorID => {
       //   this.changeFloorID(currentFloorID)
       // })
@@ -244,7 +258,7 @@ export default class NavigationView extends MapView<Props, State> {
       <TrafficView
         ref={ref => (this.trafficView = ref)}
         currentFloorID={this.state.currentFloorID}
-        getLayers={this.props.getLayers}
+        getLayers={this._getLayers}
         device={this.props.device}
         incrementRoad={() => {
           this.showFullMap(true)

@@ -1,3 +1,4 @@
+/** 地图导航界面的入口文件 */
 import { connect } from 'react-redux';
 import NavigationView from './NavigationView';
 import { openMap } from '@/redux/reducers/map';
@@ -9,10 +10,7 @@ const mapStateToProps = (state: RootState) => ({
   device: state.device.toJS(),
 })
 
-const mapDispatchToProps = {
-  openMap,
-  getLayers,
-}
+const mapDispatchToProps = {}
 
 export default connect(
   mapStateToProps,

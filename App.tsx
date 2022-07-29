@@ -106,7 +106,7 @@ class AppRoot extends React.Component<Props, State> {
       Platform.OS === 'android' && await SMap.setPermisson(true) // 权限申请
       await this.initEnvironment() // 初始化环境
       await SMap.initMapView() // 初始化唯一地图组件
-      await SMap.setCurrentModule(255) // 设置模块权限
+      // await SMap.setCurrentModule(255) // 设置模块权限
       await this.initLocation() // 打开GPS
       await this.openWorkspace() // 打开工作空间
 
