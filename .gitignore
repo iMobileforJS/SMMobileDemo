@@ -72,7 +72,6 @@ android/app/src/main/assets/Navigation*
 ios/SuperMap.framework
 ios/Trial_License.slm
 ios/Pods
-ios/iPhoneOS.sdk
 ios/iPhoneSimulator.sdk
 ios/MessageQueue.sdk
 ios/iTablet-tvOS
