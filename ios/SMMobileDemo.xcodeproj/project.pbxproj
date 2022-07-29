@@ -765,7 +765,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/iPhoneOS",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -856,9 +859,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib",
 					"$(PROJECT_DIR)/iPhoneOS",
-					"$(PROJECT_DIR)/iPhoneOS.sdk/SuperMap.framework/Versions/A",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
