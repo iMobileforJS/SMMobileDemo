@@ -5,6 +5,7 @@ import ModelUtils from './ModelUtils'
 import TouchAction from './TouchAction'
 import LayerUtils from './LayerUtils'
 import FetchUtils from './FetchUtils'
+import LicenseUtil from './LicenseUtil'
 
 export {
   screen,
@@ -16,4 +17,5 @@ export {
   TouchAction,
   LayerUtils,
   FetchUtils,
+  LicenseUtil,
 }

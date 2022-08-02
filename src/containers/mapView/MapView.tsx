@@ -21,6 +21,7 @@ import { MapViewProps } from './types'
 import { DEFAULT_DATA, DEFAULT_DATA_WORKSPACE, DEFAULT_DATA_MAP } from '../../config'
 import Toast from 'react-native-root-toast'
 import { DatasourceConnectionInfo } from 'imobile_for_reactnative/types/data'
+import License  from '../../components/License'
 
 // 离线地图数据类型
 interface itemType {
@@ -43,12 +44,14 @@ interface MapInfo {
 
 type State = {
   currentFloorID: string,
+  licenseViewIsShow: boolean,
 }
 
 export default class MapView<P, S> extends React.Component<MapViewProps & P, State & S> {
 
   container: ContainerType | undefined | null
   mapController: MapController | undefined | null
+  licenseRef: License | null | undefined
 
   fullMap = false
   currentMap:MapInfo
@@ -428,6 +431,21 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
 
   renderCustomView = () => {}
 
+  closeLicense = () => {
+    this.setState({
+      licenseViewIsShow: false,
+    })
+  }
+
+  renderLicense = () => {
+    return (
+     <License
+        close = {this.closeLicense}
+     >
+     </License>
+    )
+  }
+
   render() {
     return (
       <Container
@@ -445,6 +463,8 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
         />
         {this.renderCustomView()}
         {this.renderMapController()}
+        {this.state.licenseViewIsShow && this.renderLicense()}
+        
       </Container>
     )
   }

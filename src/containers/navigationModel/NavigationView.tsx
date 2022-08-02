@@ -8,7 +8,7 @@
  */
 import React from 'react'
 import MapView from "../mapView/MapView";
-import { scaleSize, TouchAction, Toast } from "@/utils";
+import { scaleSize, TouchAction, Toast, LicenseUtil } from "@/utils";
 import { Props as HeaderProps } from "@/components/Header/Header";
 import { TrafficView, MapSelectButton } from './components';
 import { ConstPath, DEFAULT_USER_NAME, TouchMode } from '@/constants';
@@ -40,6 +40,7 @@ export default class NavigationView extends MapView<Props, State> {
     super(props)
     this.state = {
       currentFloorID: '',
+      licenseViewIsShow: false,
     }
   }
 
@@ -286,7 +287,16 @@ export default class NavigationView extends MapView<Props, State> {
         <ImageButton
           image={getAssets().navigation.icon_navigation}
           title={'真实'}
-          onPress={() => {
+          onPress={async () => {
+            let licenseType = await LicenseUtil.getLicenseType()
+            if(!licenseType) {
+              this.setState({
+                licenseViewIsShow: true,
+              })
+              return
+            }
+
+
             if (!this.navigateAble()) {
               // 是否显示完成
               return
@@ -300,7 +310,16 @@ export default class NavigationView extends MapView<Props, State> {
         <ImageButton
           image={getAssets().navigation.dataset_type_else_black}
           title={'模拟'}
-          onPress={() => {
+          onPress={async () => {
+
+            let licenseType = await LicenseUtil.getLicenseType()
+            if(!licenseType) {
+              this.setState({
+                licenseViewIsShow: true,
+              })
+              return
+            }
+
             if (!this.navigateAble()) {
               return
             }

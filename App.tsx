@@ -23,7 +23,6 @@ import Root from '@/Root'
 import { ConstPath, DEFAULT_USER_NAME, DEFAULT_LANGUAGE } from '@/constants'
 import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
-import { Toast } from '@/utils';
 import { Dialog } from '@/components';
 import Loading from '@/components/Container/Loading';
 import { DEFAULT_DATA } from './src/config'
@@ -108,8 +107,6 @@ class AppRoot extends React.Component<Props, State> {
       await SMap.initMapView() // 初始化唯一地图组件
       await this.initLocation() // 打开GPS
       await this.openWorkspace() // 打开工作空间
-
-      await SMap.activateLicense('') // 许可激活码 xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
 
       // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
       const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')

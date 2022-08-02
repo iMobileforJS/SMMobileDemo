@@ -18,7 +18,7 @@
  import { ImageButton } from '@/components'
  import { getAssets } from '@/assets'
  import styles from './styles'
- import { openHunanMap, openChenduMap, openTiandituMap, openBingMap } from './mapBrowsingAction'
+ import { openHunanMap, openChenduMap, openTiandituMap, openBingMap, fullScreen } from './mapBrowsingAction'
  
  type Props = {
   //  getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
@@ -34,6 +34,7 @@
      super(props)
      this.state = {
       currentFloorID: '',
+      licenseViewIsShow: false,
      }
    }
  
@@ -135,8 +136,8 @@
         <ImageButton
           image={getAssets().mapBrowsing.icon_tool_full}
           onPress={() => {
-            // fullScreen
-            SMap.viewEntire()
+            // 全幅
+            fullScreen()
           }}
         />
       </View>
