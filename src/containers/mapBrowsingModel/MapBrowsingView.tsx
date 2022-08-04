@@ -18,7 +18,8 @@
  import { ImageButton } from '@/components'
  import { getAssets } from '@/assets'
  import styles from './styles'
- import { openHunanMap, openChenduMap, openTiandituMap, openBingMap } from './mapBrowsingAction'
+ import { openHunanMap, openChenduMap, openTiandituMap, openBingMap, fullScreen } from './mapBrowsingAction'
+import { DEFAULT_DATA_MAP_FILE } from './config';
  
  type Props = {
   //  getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
@@ -34,6 +35,7 @@
      super(props)
      this.state = {
       currentFloorID: '',
+      licenseViewIsShow: false,
      }
    }
  
@@ -57,6 +59,11 @@
        isResponseHeader: true,
      }
    }
+
+   getModueId = () => {
+    // 地图浏览的模块ID
+    return 0x10
+  }
  
    setGestureDetectorListener = async () => {
      await SMap.setGestureDetector({
@@ -85,6 +92,7 @@
 
    addMap = async () => {
     try {
+      await this.initData(DEFAULT_DATA_MAP_FILE)
       openTiandituMap(this, false)
     } catch (error) {
       
@@ -135,8 +143,8 @@
         <ImageButton
           image={getAssets().mapBrowsing.icon_tool_full}
           onPress={() => {
-            // fullScreen
-            SMap.viewEntire()
+            // 全幅
+            fullScreen()
           }}
         />
       </View>
