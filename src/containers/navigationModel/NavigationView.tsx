@@ -2,6 +2,7 @@
  * 地图导航界面
  * 结构：
  *   index：地图导航的入口文件
+ *   NavigationAction ：导航采集界面的功能文件
  *   NavigationView：地图导航的界面结构和渲染
  *   styles：地图导航界面的样式
  *   component文件夹: 里面放地图导航界面的相关组件
@@ -19,7 +20,8 @@ import { getLanguage } from '@/language';
 import { ImageButton } from '@/components'
 import { getAssets } from '@/assets'
 import styles from './styles'
-import { DEFAULT_DATA, DEFAULT_DATA_MAP, DEFAULT_DATA_WORKSPACE } from '@/config';
+import { DEFAULT_DATA, DEFAULT_DATA_MAP, DEFAULT_DATA_WORKSPACE } from './config';
+import NavigationAction from './NavigationAction';
 
 type Props = {
   // getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
@@ -119,7 +121,7 @@ export default class NavigationView extends MapView<Props, State> {
       })
       SMap.setStopNavigationListener({
         callback: () => {
-          this.clear()
+          NavigationAction.clear(this)
         },
       })
       SMap.setCurrentFloorIDListener({
@@ -135,12 +137,15 @@ export default class NavigationView extends MapView<Props, State> {
 
   componentWillUnmount() {
     SMap.deleteGestureDetector()
-    SMap.stopGuide()
-    this.clear()
+    NavigationAction.stopGuide()
+    NavigationAction.clear(this)
   }
 
   addMap = async () => {
     try {
+
+      // 初始化导航采集数据
+      await this.initData(DEFAULT_DATA)
 
       const home = await FileTools.appendingHomeDirectory()
 
@@ -157,6 +162,10 @@ export default class NavigationView extends MapView<Props, State> {
     } catch (error) {
       
     }
+  }
+  getModueId = () => {
+    // 导航采集的模块ID
+    return 0x20
   }
 
   magntouchCallback = async (event: { LLPoint: Point }) => {
@@ -204,20 +213,6 @@ export default class NavigationView extends MapView<Props, State> {
       return false
     }
     return true
-  }
-
-  /** 清除 */
-  clear = async () => {
-    try {
-      await SMap.removeAllCallout()
-      await SMap.removePOICallout()
-      await SMap.clearPoint()
-      this.showFullMap(false)
-      TouchAction.setTouchMode(TouchMode.NORMAL)
-      TouchAction.clearTouchPoints() // 清除起点/终点
-    } catch (error) {
-      
-    }
   }
   
   /** 添加楼层显隐监听 */
@@ -288,65 +283,28 @@ export default class NavigationView extends MapView<Props, State> {
           image={getAssets().navigation.icon_navigation}
           title={'真实'}
           onPress={async () => {
-            let licenseType = await LicenseUtil.getLicenseType()
-            if(!licenseType) {
-              this.setState({
-                licenseViewIsShow: true,
-              })
-              return
-            }
-
-
-            if (!this.navigateAble()) {
-              // 是否显示完成
-              return
-            }
-            this.showFullMap(true)
-            TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_BEGIN)
-            this.mapSelectButton?.setVisible(false)
-            SMap.outdoorNavigation(0)
+            await NavigationAction.actual(this)
           }}
         />
         <ImageButton
           image={getAssets().navigation.dataset_type_else_black}
           title={'模拟'}
           onPress={async () => {
-
-            let licenseType = await LicenseUtil.getLicenseType()
-            if(!licenseType) {
-              this.setState({
-                licenseViewIsShow: true,
-              })
-              return
-            }
-
-            if (!this.navigateAble()) {
-              return
-            }
-            this.showFullMap(true)
-            TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_BEGIN)
-            this.mapSelectButton?.setVisible(false)
-            SMap.outdoorNavigation(1)
+            await NavigationAction.simulate(this)
           }}
         />
         <ImageButton
           image={getAssets().mapTools.icon_delete}
           title={'清除'}
-          onPress={() => {
-            SMap.stopGuide()
-            this.clear()
-            this.mapSelectButton?.setVisible(false)
-            Toast.show('长按选择起点')
-            CustomTools.clearMapCallout('')
+          onPress={async () => {
+            await NavigationAction.clearCallout(this)
           }}
         />
         <ImageButton
           image={getAssets().mapTools.icon_location}
           title={'中心点'}
           onPress={async () => {
-            const point = await SMap.getMapCenter()
-            console.warn(point)
-            CustomTools.addMapCallout(point.x, point.y, '')
+            await NavigationAction.centerPoint()
           }}
         />
       </View>

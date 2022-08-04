@@ -19,6 +19,7 @@
  import { getAssets } from '@/assets'
  import styles from './styles'
  import { openHunanMap, openChenduMap, openTiandituMap, openBingMap, fullScreen } from './mapBrowsingAction'
+import { DEFAULT_DATA_MAP_FILE } from './config';
  
  type Props = {
   //  getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
@@ -58,6 +59,11 @@
        isResponseHeader: true,
      }
    }
+
+   getModueId = () => {
+    // 地图浏览的模块ID
+    return 0x10
+  }
  
    setGestureDetectorListener = async () => {
      await SMap.setGestureDetector({
@@ -86,6 +92,7 @@
 
    addMap = async () => {
     try {
+      await this.initData(DEFAULT_DATA_MAP_FILE)
       openTiandituMap(this, false)
     } catch (error) {
       

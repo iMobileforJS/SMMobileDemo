@@ -11,7 +11,7 @@
  *   2）打开BingMap地图： 打开BingMap地图
  * 
  */
-import { DEFAULT_DATA_MAP_FILE } from "@/config"
+import { DEFAULT_DATA_MAP_FILE } from "./config"
 import { ConstOnline, ConstPath, DEFAULT_USER_NAME } from "@/constants"
 import { FileTools, SMap } from "imobile_for_reactnative"
 import MapBrowsingView from "./MapBrowsingView"
@@ -41,6 +41,7 @@ export async function openHunanMap(that: MapBrowsingView): Promise<void> {
   // 数据导入成功后地图数据所在的路径
   const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map}湖南.xml`
   // 调用MapView的切换地图方法
+  debugger
   that.changeMap(true, true, {name:'湖南', path: mapPath}, path)
 }
 

@@ -18,10 +18,11 @@ import { MapController } from './components'
 import { scaleSize, TouchAction } from '@/utils'
 import { Extra } from '@/components/Container/Loading'
 import { MapViewProps } from './types'
-import { DEFAULT_DATA, DEFAULT_DATA_WORKSPACE, DEFAULT_DATA_MAP } from '../../config'
 import Toast from 'react-native-root-toast'
 import { DatasourceConnectionInfo } from 'imobile_for_reactnative/types/data'
 import License  from '../../components/License'
+import { NativeModules } from 'react-native'
+let AppUtils = NativeModules.AppUtils
 
 // 离线地图数据类型
 interface itemType {
@@ -77,8 +78,9 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
     SMap.deleteGestureDetector()
   }
 
+  /** 获取模块ID 由子类实现 返回一个数字类型 */
   getModueId = () => {
-    return undefined
+    // return undefined
   }
   _onGetInstance = () => {
     this._addMap()
@@ -104,6 +106,18 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
     } catch(e) {
 
     }
+  }
+
+  /**
+   * 初始化模块数据 在addMap里的最前面调用
+   * @param name 数据所在文件夹的名字
+   * @returns
+   */
+  initData = async (name: string): Promise<void> => {
+    // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
+    const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
+    // 拷贝之后解压到 SMMobileDemo/ExternalData/（指定名字name文件夹里）
+    await AppUtils.copyAssetFileTo(`${name}.zip`, toPath)
   }
 
   addMap = async () => {}
@@ -249,7 +263,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
 
   /**
    * 打开地图
-   * @param params 
+   * @param {MapInfo} params 地图的参数
    * @returns 
    */
   _openMap = async (params: MapInfo) => {
@@ -297,7 +311,12 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
     }
   }
 
-  /** 获取图层列表 */
+  /**
+   * 获取图层列表
+   * @param {number | {type: number, currentLayerIndex: number}} params  图层参数
+   * @param cb 回调函数
+   * @returns 
+   */
   _getLayers = async (params?: number | {type: number, currentLayerIndex: number}, cb = (layers: Array<SMap.LayerInfo>) => {}):Promise<SMap.LayerInfo[] | null> => {
    try {
     if (typeof params === 'number') {
@@ -331,7 +350,10 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
    }
   }
 
-  /** 设置为当前图层 */
+  /**
+   * 设置为当前图层
+   * @param {SMap.LayerInfo} params 图层参数
+   */
   _setCurrentLayer = async (params: SMap.LayerInfo) => {
     try {
       if (params && params.path) {
@@ -363,7 +385,12 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
    */
   showFullMapAction = (full: boolean) => {}
 
-  /** 设置Container的loading */
+  /**
+   * 设置Container的loading
+   * @param loading 是否显示动画，true显示，false不显示
+   * @param info 显示动画时的文字信息
+   * @param extra 其他
+   */
   setLoading = (loading = false, info?: string, extra?: Extra) => {
     this.container && this.container.setLoading(loading, info, extra)
   }
