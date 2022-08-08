@@ -17,6 +17,7 @@ const icon_scene_tool_end = require('./icon_scene_tool_end.png')
 const icon_scene_tool_start = require('./icon_scene_tool_start.png')
 
 const icon_tool_cancel = require('./icon_tool_cancel.png')
+const icon_close = require('./icon_close.png')
 
 export default {
   search_icon_bank,
@@ -37,4 +38,5 @@ export default {
   icon_scene_tool_end,
   icon_scene_tool_start,
   icon_tool_cancel,
+  icon_close,
 }

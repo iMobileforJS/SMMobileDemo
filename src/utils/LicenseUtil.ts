@@ -4,6 +4,7 @@
  * 功能：
  *   getLicenseType： 获取当前许可类型
  *   activateLicense：激活离线许可
+ *   reloadLocalLicense： 重新加载已激活的离线许可
  *   loginCloudLicense：登录云许可
  *   queryCloudLicense：查询云许可
  *   applyCloudTrialLicense：激活云许可
@@ -64,6 +65,23 @@ async function activateLicense(code: string): Promise<boolean>{
     Toast.show('激活失败')
     licenseCurrentType = null
     return false
+  }
+}
+
+/**
+ * 重新加载已激活的离线许可 （在激活离线许可后，退出app，再次进入app需要调这个方法来重新加载已激活的离线许可）
+ * @returns
+ */
+async function reloadLocalLicense(): Promise<void>{
+  try {
+    const result = await SMap.reloadLocalLicense()
+    if(result) {
+      licenseCurrentType = 'offline'
+    } else {
+      licenseCurrentType = null
+    }
+  } catch (error) {
+    console.warn("已有许可激活失败")
   }
 }
 
@@ -251,6 +269,7 @@ async function logoutCloudLicense(): Promise<void> {
 export default{
   getLicenseType,
   activateLicense,
+  reloadLocalLicense,
   loginCloudLicense,
   queryCloudLicense,
   applyCloudTrialLicense,

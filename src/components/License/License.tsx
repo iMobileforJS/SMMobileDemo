@@ -85,29 +85,79 @@ class License extends Component<Props, State> {
 
   /** 激活离线许可 */
   activeOffline = async () => {
-    const result = await LicenseUtil.activateLicense(this.state.offlineCode)
-    if(result) {
-      this.setState({
-        userName: '',
-        password: '',
-        offlineCode: '',
-      })
-      this.close()
-    } else {
-      this.setState({
-        password: '',
-        offlineCode: '',
-      })
-    }
+    let code = this.state.offlineCode.toUpperCase()
+    const result = await LicenseUtil.activateLicense(code)
+  }
+  /** 清空云许可的账号输入框 */
+  clearCloudName = () => {
+    this.setState({
+      userName: '',
+    })
+  }
+  /** 清空云许可的密码输入框 */
+  clearCloudPwd = () => {
+    this.setState({
+      password: '',
+    })
+  }
+  /** 清空离线许可的序列码输入框 */
+  clearOfflineCode = () => {
+    this.setState({
+      offlineCode: '',
+    })
   }
 
   /** 关闭许可面板 */
   close = () => {
     try {
+      this.setState({
+        userName: '',
+        password: '',
+        offlineCode: '',
+      })
       this.props.close && this.props.close()
     } catch (error) {
       Toast.show("关闭许可面板失败")
     }
+  }
+
+  /**
+   * 清空按钮
+   * @param value 值
+   * @param type 哪种类型的清空按钮 offline | cloudPwd | cloudName
+   * @returns 
+   */
+   renderClearBtn = (value: string, type: string) => {
+    if (value === '') {
+      return null
+    }
+    return (
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.clearBtn}
+        onPress={() => {
+          switch(type) {
+            case 'offline' :
+              this.clearOfflineCode()
+              break
+            case 'cloudPwd' : 
+              this.clearCloudPwd()
+              break
+            case 'cloudName' : 
+              this.clearCloudName()
+              break
+            default :
+              break
+          }
+        }}
+      >
+        <Image
+          style={styles.clearImg}
+          resizeMode={'contain'}
+          source={getAssets().poi.icon_close}
+        />
+      </TouchableOpacity>
+    )
   }
 
   /** 云许可模块渲染 */
@@ -115,13 +165,29 @@ class License extends Component<Props, State> {
     return (
       <View style = {[styles.cloudView]}>
         {/* <Text>{"我是在线模块儿"}</Text> */}
-        <TextInput
-          style = {[styles.cloudInput]}
-          placeholder = {'账号'}
-          value = {this.state.userName}
-          onChangeText = {this.cloudChangeName}
-        />
-        <TextInput
+        <View style={[styles.cloudInputContainer]}>
+          <TextInput
+            style = {[styles.cloudInput]}
+            placeholder = {'账号'}
+            value = {this.state.userName}
+            onChangeText = {this.cloudChangeName}
+          />
+          {this.renderClearBtn(this.state.userName, 'cloudName')}
+        </View>
+       
+        <View style={[styles.cloudInputContainer]}>
+          <TextInput
+            style = {[styles.cloudInput]}
+            multiline={false}
+            textContentType = {'password'}
+            secureTextEntry = {true}
+            placeholder = {'密码'}
+            value = {this.state.password}
+            onChangeText = {this.cloudChangePwd}
+          />
+          {this.renderClearBtn(this.state.password, 'cloudPwd')}
+        </View>
+        {/* <TextInput
           style = {[styles.cloudInput]}
           multiline={false}
           textContentType = {'password'}
@@ -129,7 +195,7 @@ class License extends Component<Props, State> {
           placeholder = {'密码'}
           value = {this.state.password}
           onChangeText = {this.cloudChangePwd}
-        />
+        /> */}
 
         <TouchableOpacity
           style = {[styles.cloudButton]}
@@ -146,12 +212,15 @@ class License extends Component<Props, State> {
     return (
       <View style = {[styles.offlineView]}>
         <Text>{'请输入离线许可序列码：'}</Text>
-        <TextInput
-          style = {[styles.offlineInput]}
-          multiline={false}
-          value = {this.state.offlineCode}
-          onChangeText = {this.offlineCodeChange}
-        />
+        <View style = {[styles.offlineInputContainer]}> 
+          <TextInput
+            style = {[styles.offlineInput]}
+            multiline={false}
+            value = {this.state.offlineCode}
+            onChangeText = {this.offlineCodeChange}
+          />
+          {this.renderClearBtn(this.state.offlineCode, 'offline')}
+        </View>
 
         <TouchableOpacity
           style = {[styles.cloudButton]}

@@ -28,7 +28,9 @@ type Props = {
 }
 
 type State = {
-  // currentFloorID: string,
+  currentFloorID: string,
+  licenseViewIsShow: boolean,
+  isFull: boolean,
 }
 
 export default class NavigationView extends MapView<Props, State> {
@@ -43,6 +45,7 @@ export default class NavigationView extends MapView<Props, State> {
     this.state = {
       currentFloorID: '',
       licenseViewIsShow: false,
+      isFull: true,
     }
   }
 
@@ -235,7 +238,12 @@ export default class NavigationView extends MapView<Props, State> {
   }
 
   showFullMapAction = (full: boolean) => {
-    this.trafficView?.setVisible(full)
+    try {
+      this.trafficView?.setVisible(full)
+      this.setState({isFull: full})
+    } catch (error) {
+      console.warn('地图浏览全屏拓展方法出错')
+    }
   }
 
   renderCustomView = () => {
@@ -243,7 +251,7 @@ export default class NavigationView extends MapView<Props, State> {
       <>
         {this._renderTrafficView()}
         {this._renderMapSelectButton()}
-        {this._renderButtons()}
+        {this.state.isFull && this._renderButtons()}
       </>
     )
   }

@@ -27,6 +27,8 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
  
  type State = {
    currentFloorID: string,
+   licenseViewIsShow: boolean,
+   isFull: boolean,
  }
  
  export default class MapBrowsingView extends MapView<Props, State> {
@@ -36,6 +38,7 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
      this.state = {
       currentFloorID: '',
       licenseViewIsShow: false,
+      isFull: true,
      }
    }
  
@@ -99,6 +102,18 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
     }
   }
 
+  /**
+   * 拓展父类的全屏方法
+   * @param full 
+   */
+  showFullMapAction = (full: boolean) => {
+    try {
+      this.setState({isFull: full})
+    } catch (error) {
+      console.warn('地图浏览全屏拓展方法出错')
+    }
+  }
+
   _renderLocalMapButtons = () => {
     return (
       <View style={styles.buttons}>
@@ -155,8 +170,8 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
    renderCustomView = () => {
      return (
        <>
-        {this._renderLocalMapButtons()}
-        {this._renderRightBottomButtons()}
+        {this.state.isFull && this._renderLocalMapButtons()}
+        {this.state.isFull && this._renderRightBottomButtons()}
        </>
      )
    }

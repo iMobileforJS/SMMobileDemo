@@ -87,14 +87,23 @@ export default StyleSheet.create({
     borderBottomRightRadius: scaleSize(20),
     paddingTop: scaleSize(10),
   },
-  cloudInput: {
+  cloudInputContainer: {
     width: '80%',
+    height: scaleSize(60),
+    flexDirection: 'row',
+    backgroundColor: '#f3f3f3',
+    borderRadius: scaleSize(30),
+    marginVertical: scaleSize(10),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cloudInput: {
+    flex: 1,
     height: scaleSize(60),
     paddingVertical: scaleSize(5),
     paddingHorizontal: scaleSize(10),
     backgroundColor: '#f3f3f3',
     borderRadius: scaleSize(30),
-    marginVertical: scaleSize(10),
     textAlign: 'center',
   },
   cloudButton: {
@@ -122,15 +131,37 @@ export default StyleSheet.create({
     borderBottomRightRadius: scaleSize(20),
     paddingTop: scaleSize(20),
   },
-  offlineInput: {
+  offlineInputContainer: {
     width: '90%',
+    height: scaleSize(60),
+    flexDirection: 'row',
+    backgroundColor: '#f3f3f3',
+    borderRadius: scaleSize(30),
+    marginVertical: scaleSize(20),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  offlineInput: {
+    flex: 1,
     height: scaleSize(60),
     paddingVertical: scaleSize(5),
     paddingHorizontal: scaleSize(10),
     backgroundColor: '#f3f3f3',
     borderRadius: scaleSize(30),
-    marginVertical: scaleSize(20),
     textAlign: 'center',
+  },
+  // 清空按钮
+  clearBtn: {
+    width: scaleSize(52),
+    height: scaleSize(52),
+    paddingRight: scaleSize(10),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  clearImg: {
+    width: scaleSize(52),
+    height: scaleSize(52),
   },
 
   // 关闭按钮

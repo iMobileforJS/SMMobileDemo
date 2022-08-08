@@ -495,6 +495,12 @@ function getLicenseType (): string | null
 async function activateLicense(code: string): Promise<boolean>
 
 /**
+ * 重新加载已激活的离线许可 （在激活离线许可后，退出app，再次进入app需要调这个方法来重新加载已激活的离线许可）
+ * @returns
+ */
+async function reloadLocalLicense(): Promise<void>
+
+/**
  * 登录云许可 （登录云许可 --> 查询云许可 --> 激活云许可）
  * @param {string} user 云许可账号
  * @param {string} pwd 云许可账号对应的密码

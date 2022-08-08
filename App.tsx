@@ -25,6 +25,7 @@ import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
 import { Dialog } from '@/components';
 import Loading from '@/components/Container/Loading';
+import { LicenseUtil } from '@/utils';
 let AppUtils = NativeModules.AppUtils
 
 interface Props {
@@ -106,6 +107,9 @@ class AppRoot extends React.Component<Props, State> {
       await SMap.initMapView() // 初始化唯一地图组件
       await this.initLocation() // 打开GPS
       await this.openWorkspace() // 打开工作空间
+
+      // 重新加载已经激活的离线许可
+      LicenseUtil.reloadLocalLicense() 
 
       this.setState({
         isInit: 'done',
