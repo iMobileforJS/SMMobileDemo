@@ -69,7 +69,7 @@ class AppRoot extends React.Component<Props, State> {
       this.Loading?.setLoading(true, '权限申请中')
       const results: any = await PermissionsAndroid.requestMultiple([
         'android.permission.READ_PHONE_STATE',
-        // 'android.permission.ACCESS_FINE_LOCATION',
+        'android.permission.ACCESS_FINE_LOCATION',
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.WRITE_EXTERNAL_STORAGE',
         // 'android.permission.CAMERA',
