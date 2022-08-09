@@ -40,6 +40,8 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <!-- 将value的值改为用户自己申请的key，name的值不能改!!! -->
+      <meta-data android:name="AmapApiKey" android:value="6e85d0df639491522620c9822e83a88d" />
     </application>
 
   <supports-screens
