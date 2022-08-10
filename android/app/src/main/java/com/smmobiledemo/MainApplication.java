@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.supermap.rnsupermap.SupermapFullPackage;
+import com.supermap.rnsupermap.SuperMapFullPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import ca.jaysoo.extradimensions.ExtraDimensionsPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
