@@ -8,12 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* SMMobileDemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* SMMobileDemoTests.m */; };
+		0A210D522991E5A30027BEB7 /* GLTFSceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D4D2991E5A20027BEB7 /* GLTFSceneKit.framework */; };
+		0A210D532991E5A40027BEB7 /* GLTFSceneKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D4D2991E5A20027BEB7 /* GLTFSceneKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0A210D542991E5A40027BEB7 /* RMQClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D4E2991E5A20027BEB7 /* RMQClient.framework */; };
+		0A210D552991E5A40027BEB7 /* RMQClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D4E2991E5A20027BEB7 /* RMQClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0A210D562991E5A40027BEB7 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D4F2991E5A20027BEB7 /* CocoaAsyncSocket.framework */; };
+		0A210D572991E5A40027BEB7 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D4F2991E5A20027BEB7 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0A210D582991E5A40027BEB7 /* JKVValue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D502991E5A30027BEB7 /* JKVValue.framework */; };
+		0A210D592991E5A40027BEB7 /* JKVValue.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D502991E5A30027BEB7 /* JKVValue.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0A210D5A2991E5A40027BEB7 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D512991E5A30027BEB7 /* ZipArchive.framework */; };
+		0A210D5B2991E5A40027BEB7 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A210D512991E5A30027BEB7 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A4417D827CE1B8B00DDF353 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417D627CE1B8B00DDF353 /* Accelerate.framework */; };
 		0A4417DA27CE1B9100DDF353 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417D927CE1B9000DDF353 /* AddressBook.framework */; };
 		0A4417DC27CE1B9A00DDF353 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417DB27CE1B9900DDF353 /* AudioToolbox.framework */; };
 		0A4417DE27CE1BA000DDF353 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417DD27CE1BA000DDF353 /* AVFoundation.framework */; };
-		0A4417E027CE1BB500DDF353 /* CocoaAsyncSocket.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417DF27CE1BB500DDF353 /* CocoaAsyncSocket.framework */; };
-		0A4417E127CE1BB600DDF353 /* CocoaAsyncSocket.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417DF27CE1BB500DDF353 /* CocoaAsyncSocket.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A4417E427CE1BCC00DDF353 /* Contacts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417E327CE1BCB00DDF353 /* Contacts.framework */; };
 		0A4417E627CE1BD500DDF353 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417E527CE1BD500DDF353 /* CoreGraphics.framework */; };
 		0A4417E827CE1BDC00DDF353 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417E727CE1BDB00DDF353 /* CoreLocation.framework */; };
@@ -21,8 +29,6 @@
 		0A4417EC27CE1BE800DDF353 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417EB27CE1BE800DDF353 /* CoreTelephony.framework */; };
 		0A4417EE27CE1BF000DDF353 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417ED27CE1BF000DDF353 /* CoreText.framework */; };
 		0A4417F027CE1BF700DDF353 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417EF27CE1BF700DDF353 /* ExternalAccessory.framework */; };
-		0A4417F227CE1BFF00DDF353 /* JKVValue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417F127CE1BFF00DDF353 /* JKVValue.framework */; };
-		0A4417F327CE1BFF00DDF353 /* JKVValue.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417F127CE1BFF00DDF353 /* JKVValue.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A44180027CE1C5100DDF353 /* libstdc++.6.0.9.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4417FF27CE1C4E00DDF353 /* libstdc++.6.0.9.tbd */; };
 		0A44180227CE1C6900DDF353 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180127CE1C5F00DDF353 /* libiconv.2.4.0.tbd */; };
 		0A44180427CE1C7C00DDF353 /* libicucore.A.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180327CE1C7200DDF353 /* libicucore.A.tbd */; };
@@ -30,17 +36,11 @@
 		0A44180927CE1C9800DDF353 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180827CE1C9800DDF353 /* MobileCoreServices.framework */; };
 		0A44180B27CE1C9F00DDF353 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180A27CE1C9F00DDF353 /* OpenGLES.framework */; };
 		0A44180D27CE1CA600DDF353 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180C27CE1CA600DDF353 /* QuartzCore.framework */; };
-		0A44180F27CE1CB500DDF353 /* RMQClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180E27CE1CB500DDF353 /* RMQClient.framework */; };
-		0A44181027CE1CB500DDF353 /* RMQClient.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44180E27CE1CB500DDF353 /* RMQClient.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A44181227CE1CD700DDF353 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181127CE1CD700DDF353 /* Security.framework */; };
 		0A44181427CE1CE300DDF353 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181327CE1CE300DDF353 /* SystemConfiguration.framework */; };
 		0A44181627CE1CE900DDF353 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181527CE1CE900DDF353 /* UIKit.framework */; };
 		0A44181827CE1CEE00DDF353 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181727CE1CEE00DDF353 /* WebKit.framework */; };
-		0A44182027CE1D8D00DDF353 /* GLTFSceneKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181F27CE1D8D00DDF353 /* GLTFSceneKit.framework */; };
-		0A44182127CE1D8D00DDF353 /* GLTFSceneKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181F27CE1D8D00DDF353 /* GLTFSceneKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A44182827CE2A7000DDF353 /* Workspace.zip in Resources */ = {isa = PBXBuildFile; fileRef = 0A44182727CE2A7000DDF353 /* Workspace.zip */; };
-		0A4418B127CE41B500DDF353 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4418B027CE41B500DDF353 /* ZipArchive.framework */; };
-		0A4418B227CE41B500DDF353 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0A4418B027CE41B500DDF353 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0AA85F1D27D5D4480067CB94 /* Navigation_EXAMPLE.zip in Resources */ = {isa = PBXBuildFile; fileRef = 0AA85F1A27D5D4470067CB94 /* Navigation_EXAMPLE.zip */; };
 		0AA85F2327D5D4520067CB94 /* AppUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AA85F2127D5D4520067CB94 /* AppUtils.m */; };
 		0AA861B127D5E4FE0067CB94 /* resources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0AA861B027D5E4FE0067CB94 /* resources.bundle */; };
@@ -72,17 +72,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0A4417E227CE1BB600DDF353 /* Embed Frameworks */ = {
+		0A210D392991DD700027BEB7 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				0A4417F327CE1BFF00DDF353 /* JKVValue.framework in Embed Frameworks */,
-				0A44181027CE1CB500DDF353 /* RMQClient.framework in Embed Frameworks */,
-				0A4417E127CE1BB600DDF353 /* CocoaAsyncSocket.framework in Embed Frameworks */,
-				0A44182127CE1D8D00DDF353 /* GLTFSceneKit.framework in Embed Frameworks */,
-				0A4418B227CE41B500DDF353 /* ZipArchive.framework in Embed Frameworks */,
+				0A210D572991E5A40027BEB7 /* CocoaAsyncSocket.framework in Embed Frameworks */,
+				0A210D552991E5A40027BEB7 /* RMQClient.framework in Embed Frameworks */,
+				0A210D592991E5A40027BEB7 /* JKVValue.framework in Embed Frameworks */,
+				0A210D532991E5A40027BEB7 /* GLTFSceneKit.framework in Embed Frameworks */,
+				0A210D5B2991E5A40027BEB7 /* ZipArchive.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -93,11 +93,15 @@
 		00E356EE1AD99517003FC87E /* SMMobileDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SMMobileDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* SMMobileDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SMMobileDemoTests.m; sourceTree = "<group>"; };
+		0A210D4D2991E5A20027BEB7 /* GLTFSceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLTFSceneKit.framework; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib/GLTFSceneKit.framework; sourceTree = "<group>"; };
+		0A210D4E2991E5A20027BEB7 /* RMQClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RMQClient.framework; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib/RMQClient.framework; sourceTree = "<group>"; };
+		0A210D4F2991E5A20027BEB7 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
+		0A210D502991E5A30027BEB7 /* JKVValue.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JKVValue.framework; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib/JKVValue.framework; sourceTree = "<group>"; };
+		0A210D512991E5A30027BEB7 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib/ZipArchive.framework; sourceTree = "<group>"; };
 		0A4417D627CE1B8B00DDF353 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
 		0A4417D927CE1B9000DDF353 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		0A4417DB27CE1B9900DDF353 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		0A4417DD27CE1BA000DDF353 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		0A4417DF27CE1BB500DDF353 /* CocoaAsyncSocket.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CocoaAsyncSocket.framework; path = iPhoneOS.sdk/CocoaAsyncSocket.framework; sourceTree = "<group>"; };
 		0A4417E327CE1BCB00DDF353 /* Contacts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Contacts.framework; path = System/Library/Frameworks/Contacts.framework; sourceTree = SDKROOT; };
 		0A4417E527CE1BD500DDF353 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		0A4417E727CE1BDB00DDF353 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -105,7 +109,6 @@
 		0A4417EB27CE1BE800DDF353 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		0A4417ED27CE1BF000DDF353 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		0A4417EF27CE1BF700DDF353 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
-		0A4417F127CE1BFF00DDF353 /* JKVValue.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JKVValue.framework; path = iPhoneOS.sdk/JKVValue.framework; sourceTree = "<group>"; };
 		0A4417FF27CE1C4E00DDF353 /* libstdc++.6.0.9.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.6.0.9.tbd"; path = "iPhoneOS/libstdc++.6.0.9.tbd"; sourceTree = "<group>"; };
 		0A44180127CE1C5F00DDF353 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		0A44180327CE1C7200DDF353 /* libicucore.A.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libicucore.A.tbd; path = usr/lib/libicucore.A.tbd; sourceTree = SDKROOT; };
@@ -113,14 +116,11 @@
 		0A44180827CE1C9800DDF353 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		0A44180A27CE1C9F00DDF353 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		0A44180C27CE1CA600DDF353 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		0A44180E27CE1CB500DDF353 /* RMQClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RMQClient.framework; path = iPhoneOS.sdk/RMQClient.framework; sourceTree = "<group>"; };
 		0A44181127CE1CD700DDF353 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		0A44181327CE1CE300DDF353 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		0A44181527CE1CE900DDF353 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		0A44181727CE1CEE00DDF353 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
-		0A44181F27CE1D8D00DDF353 /* GLTFSceneKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLTFSceneKit.framework; path = iPhoneOS.sdk/GLTFSceneKit.framework; sourceTree = "<group>"; };
 		0A44182727CE2A7000DDF353 /* Workspace.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Workspace.zip; sourceTree = "<group>"; };
-		0A4418B027CE41B500DDF353 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = iPhoneOS.sdk/ZipArchive.framework; sourceTree = "<group>"; };
 		0AA85F1A27D5D4470067CB94 /* Navigation_EXAMPLE.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Navigation_EXAMPLE.zip; sourceTree = "<group>"; };
 		0AA85F2127D5D4520067CB94 /* AppUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppUtils.m; sourceTree = "<group>"; };
 		0AA85F2227D5D4520067CB94 /* AppUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppUtils.h; sourceTree = "<group>"; };
@@ -158,18 +158,19 @@
 			files = (
 				479B8370289290B30008824B /* libSMSuperMap.a in Frameworks */,
 				0A4417E427CE1BCC00DDF353 /* Contacts.framework in Frameworks */,
-				0A4417E027CE1BB500DDF353 /* CocoaAsyncSocket.framework in Frameworks */,
 				0A4417DA27CE1B9100DDF353 /* AddressBook.framework in Frameworks */,
 				0A44180B27CE1C9F00DDF353 /* OpenGLES.framework in Frameworks */,
+				0A210D522991E5A30027BEB7 /* GLTFSceneKit.framework in Frameworks */,
 				0A44180927CE1C9800DDF353 /* MobileCoreServices.framework in Frameworks */,
 				0A4417EC27CE1BE800DDF353 /* CoreTelephony.framework in Frameworks */,
 				0A4417E827CE1BDC00DDF353 /* CoreLocation.framework in Frameworks */,
 				0A44180D27CE1CA600DDF353 /* QuartzCore.framework in Frameworks */,
+				0A210D562991E5A40027BEB7 /* CocoaAsyncSocket.framework in Frameworks */,
+				0A210D582991E5A40027BEB7 /* JKVValue.framework in Frameworks */,
 				0A4417EA27CE1BE200DDF353 /* CoreMedia.framework in Frameworks */,
-				0A44180F27CE1CB500DDF353 /* RMQClient.framework in Frameworks */,
 				49FABE331317A6D534997ACF /* libPods-SMMobileDemo.a in Frameworks */,
-				0A44182027CE1D8D00DDF353 /* GLTFSceneKit.framework in Frameworks */,
 				0A4417E627CE1BD500DDF353 /* CoreGraphics.framework in Frameworks */,
+				0A210D542991E5A40027BEB7 /* RMQClient.framework in Frameworks */,
 				0A44180227CE1C6900DDF353 /* libiconv.2.4.0.tbd in Frameworks */,
 				0A44181427CE1CE300DDF353 /* SystemConfiguration.framework in Frameworks */,
 				0A44181227CE1CD700DDF353 /* Security.framework in Frameworks */,
@@ -178,13 +179,12 @@
 				0A4417EE27CE1BF000DDF353 /* CoreText.framework in Frameworks */,
 				0A44181627CE1CE900DDF353 /* UIKit.framework in Frameworks */,
 				0A4417DE27CE1BA000DDF353 /* AVFoundation.framework in Frameworks */,
+				0A210D5A2991E5A40027BEB7 /* ZipArchive.framework in Frameworks */,
 				0A44180027CE1C5100DDF353 /* libstdc++.6.0.9.tbd in Frameworks */,
-				0A4417F227CE1BFF00DDF353 /* JKVValue.framework in Frameworks */,
 				0A4417D827CE1B8B00DDF353 /* Accelerate.framework in Frameworks */,
 				0A4417DC27CE1B9A00DDF353 /* AudioToolbox.framework in Frameworks */,
 				0A44180727CE1C9000DDF353 /* MediaPlayer.framework in Frameworks */,
 				0A4417F027CE1BF700DDF353 /* ExternalAccessory.framework in Frameworks */,
-				0A4418B127CE41B500DDF353 /* ZipArchive.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,14 +252,16 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0A210D4F2991E5A20027BEB7 /* CocoaAsyncSocket.framework */,
+				0A210D4D2991E5A20027BEB7 /* GLTFSceneKit.framework */,
+				0A210D502991E5A30027BEB7 /* JKVValue.framework */,
+				0A210D4E2991E5A20027BEB7 /* RMQClient.framework */,
+				0A210D512991E5A30027BEB7 /* ZipArchive.framework */,
 				479B835C289289CE0008824B /* SuperMap.bundle */,
-				0A4418B027CE41B500DDF353 /* ZipArchive.framework */,
-				0A44181F27CE1D8D00DDF353 /* GLTFSceneKit.framework */,
 				0A44181727CE1CEE00DDF353 /* WebKit.framework */,
 				0A44181527CE1CE900DDF353 /* UIKit.framework */,
 				0A44181327CE1CE300DDF353 /* SystemConfiguration.framework */,
 				0A44181127CE1CD700DDF353 /* Security.framework */,
-				0A44180E27CE1CB500DDF353 /* RMQClient.framework */,
 				0A44180C27CE1CA600DDF353 /* QuartzCore.framework */,
 				0A44180A27CE1C9F00DDF353 /* OpenGLES.framework */,
 				0A44180827CE1C9800DDF353 /* MobileCoreServices.framework */,
@@ -267,7 +269,6 @@
 				0A44180327CE1C7200DDF353 /* libicucore.A.tbd */,
 				0A44180127CE1C5F00DDF353 /* libiconv.2.4.0.tbd */,
 				0A4417FF27CE1C4E00DDF353 /* libstdc++.6.0.9.tbd */,
-				0A4417F127CE1BFF00DDF353 /* JKVValue.framework */,
 				0A4417EF27CE1BF700DDF353 /* ExternalAccessory.framework */,
 				0A4417ED27CE1BF000DDF353 /* CoreText.framework */,
 				0A4417EB27CE1BE800DDF353 /* CoreTelephony.framework */,
@@ -275,7 +276,6 @@
 				0A4417E727CE1BDB00DDF353 /* CoreLocation.framework */,
 				0A4417E527CE1BD500DDF353 /* CoreGraphics.framework */,
 				0A4417E327CE1BCB00DDF353 /* Contacts.framework */,
-				0A4417DF27CE1BB500DDF353 /* CocoaAsyncSocket.framework */,
 				0A4417DD27CE1BA000DDF353 /* AVFoundation.framework */,
 				0A4417DB27CE1B9900DDF353 /* AudioToolbox.framework */,
 				0A4417D927CE1B9000DDF353 /* AddressBook.framework */,
@@ -367,7 +367,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				04ED36D19D51996039881BF8 /* [CP] Embed Pods Frameworks */,
 				24DE041D18A0780D8DE3FECE /* [CP] Copy Pods Resources */,
-				0A4417E227CE1BB600DDF353 /* Embed Frameworks */,
+				0A210D392991DD700027BEB7 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -701,9 +701,10 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/iPhoneOS.sdk",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/MessageQueue.sdk",
+					"$(PROJECT_DIR)/iPhoneOS.sdk",
+					"$(SRCROOT)/../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk",
+					"$(SRCROOT)/../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -794,9 +795,10 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/iPhoneOS.sdk",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/MessageQueue.sdk",
+					"$(PROJECT_DIR)/iPhoneOS.sdk",
+					"$(SRCROOT)/../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk",
+					"$(SRCROOT)/../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/ThirdLib",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
