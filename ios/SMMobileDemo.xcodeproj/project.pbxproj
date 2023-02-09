@@ -41,7 +41,6 @@
 		0A44181627CE1CE900DDF353 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181527CE1CE900DDF353 /* UIKit.framework */; };
 		0A44181827CE1CEE00DDF353 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181727CE1CEE00DDF353 /* WebKit.framework */; };
 		0A44182827CE2A7000DDF353 /* Workspace.zip in Resources */ = {isa = PBXBuildFile; fileRef = 0A44182727CE2A7000DDF353 /* Workspace.zip */; };
-		0AA85F1D27D5D4480067CB94 /* Navigation_EXAMPLE.zip in Resources */ = {isa = PBXBuildFile; fileRef = 0AA85F1A27D5D4470067CB94 /* Navigation_EXAMPLE.zip */; };
 		0AA85F2327D5D4520067CB94 /* AppUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AA85F2127D5D4520067CB94 /* AppUtils.m */; };
 		0AA861B127D5E4FE0067CB94 /* resources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0AA861B027D5E4FE0067CB94 /* resources.bundle */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -121,7 +120,6 @@
 		0A44181527CE1CE900DDF353 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		0A44181727CE1CEE00DDF353 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		0A44182727CE2A7000DDF353 /* Workspace.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Workspace.zip; sourceTree = "<group>"; };
-		0AA85F1A27D5D4470067CB94 /* Navigation_EXAMPLE.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Navigation_EXAMPLE.zip; sourceTree = "<group>"; };
 		0AA85F2127D5D4520067CB94 /* AppUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppUtils.m; sourceTree = "<group>"; };
 		0AA85F2227D5D4520067CB94 /* AppUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppUtils.h; sourceTree = "<group>"; };
 		0AA85F3B27D5D6300067CB94 /* SMSuperMap.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMSuperMap.xcodeproj; path = ../node_modules/imobile_for_reactnative/ios/SMSuperMap.xcodeproj; sourceTree = "<group>"; };
@@ -228,7 +226,6 @@
 		0AF4856727BF8E2E0087F871 /* assets */ = {
 			isa = PBXGroup;
 			children = (
-				0AA85F1A27D5D4470067CB94 /* Navigation_EXAMPLE.zip */,
 				0A44182727CE2A7000DDF353 /* Workspace.zip */,
 			);
 			path = assets;
@@ -446,7 +443,6 @@
 				0A44182827CE2A7000DDF353 /* Workspace.zip in Resources */,
 				479B835D289289CF0008824B /* SuperMap.bundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				0AA85F1D27D5D4480067CB94 /* Navigation_EXAMPLE.zip in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -456,7 +452,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 8;
 			files = (
 			);
 			inputPaths = (
@@ -464,7 +460,7 @@
 			name = "Bundle React Native code and images";
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
@@ -698,7 +694,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = URZW253WPZ;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -792,7 +788,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = URZW253WPZ;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
