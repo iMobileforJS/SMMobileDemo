@@ -2,7 +2,7 @@
  * APP首页
  */
 import { getAssets } from '@/assets';
-import { scaleSize } from '@/utils';
+import { scaleSize, screen } from '@/utils';
 import React from 'react';
 import {View, Button, Text, Image, Platform} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -10,7 +10,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 export default function Home({navigation}: any) {
   const paddingVerticalvalue = Platform.OS === 'android' ? 20 : 30
   return (
-    <View style={{paddingVertical: scaleSize(paddingVerticalvalue)}}>
+    <View style={{paddingVertical: scaleSize(paddingVerticalvalue), paddingTop: screen.getIphonePaddingTop()}}>
       <View>
         <TouchableOpacity
           style = {[
@@ -40,6 +40,9 @@ export default function Home({navigation}: any) {
       </View>
       <View style ={{marginTop: scaleSize(20)}}>
         <Button title="导航采集" onPress={() => navigation.navigate('NavigationView')}/>
+      </View>
+      <View style ={{marginTop: scaleSize(20)}}>
+        <Button title="AR地图" onPress={() => navigation.navigate('ARMap')}/>
       </View>
     </View>
   );

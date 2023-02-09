@@ -165,7 +165,7 @@ async function queryCloudLicense(): Promise<licenseResultType | null | undefined
       Toast.show("查询许可失败")
       licenseCurrentType = null
       await logoutCloudLicense()
-      return false
+      return null
     }
     licenseResult.isStaff = false
     if(licenseResult.licenses.length === 0) {

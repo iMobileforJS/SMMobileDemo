@@ -7,6 +7,8 @@ import HardwareBackHandler from "./HardwareBackHandler"
 import {
   Dialog,
 } from "./Dialog"
+import Button from "./Button"
+import SlideBar from "./SlideBar"
 
 export {
   Container,
@@ -16,4 +18,6 @@ export {
   SearchBar,
   HardwareBackHandler,
   Dialog,
+  Button,
+  SlideBar,
 }

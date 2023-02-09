@@ -25,7 +25,7 @@ import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
 import { Dialog } from '@/components';
 import Loading from '@/components/Container/Loading';
-import { LicenseUtil } from '@/utils';
+import { LicenseUtil, Toast } from '@/utils';
 let AppUtils = NativeModules.AppUtils
 
 interface Props {
@@ -104,6 +104,8 @@ class AppRoot extends React.Component<Props, State> {
       this.initOrientation()
       Platform.OS === 'android' && await SMap.setPermisson(true) // 权限申请
       await this.initEnvironment() // 初始化环境
+      SMap.setModuleListener(this.onInvalidModule)
+      SMap.setLicenseListener(this.onInvalidLicense)
       await SMap.initMapView() // 初始化唯一地图组件
       await this.initLocation() // 打开GPS
       await this.openWorkspace() // 打开工作空间
@@ -120,6 +122,14 @@ class AppRoot extends React.Component<Props, State> {
       this.Loading?.setLoading(false)
       console.warn('init error')
     }
+  }
+
+  onInvalidModule = () => {
+    Toast.show('当前模块许可无效，不能进行此操作。')
+  }
+
+  onInvalidLicense = () => {
+    Toast.show('许可无效，不能进行此操作。')
   }
 
   /**

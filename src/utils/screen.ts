@@ -176,7 +176,7 @@ function getIphonePaddingTop(orientation?: string) {
   const _orientation = orientation || getOrientation()
   if (_orientation.indexOf('PORTRAIT') < 0) return paddingTop
   if (isIphoneX()) {
-    // paddingTop = X_TOP
+    paddingTop = X_TOP
   } else if (Platform.OS === 'ios') {
     paddingTop = IOS_TOP
   }

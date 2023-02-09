@@ -3,7 +3,7 @@
  */
 import navigation from "@/assets/navigation";
 import License from "@/components/License";
-import { LicenseUtil, scaleSize, Toast } from "@/utils";
+import { LicenseUtil, scaleSize, screen, Toast } from "@/utils";
 import React, { Component } from "react";
 import { View, Button, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -65,7 +65,7 @@ class Home01 extends Component<Props, State> {
 
   render() {
     return (
-      <View style = {[styles.container]}>
+      <View style = {[styles.container, {paddingTop: screen.getIphonePaddingTop()}]}>
         <TouchableOpacity
           style = {[styles.Btn]}
           onPress = {this.license}

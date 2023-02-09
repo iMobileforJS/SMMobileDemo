@@ -5,7 +5,7 @@ import {
   CardStyleInterpolators,
 } from '@react-navigation/stack';
 import { NavigationService } from './utils';
-import { Home, MapView, NavigationView ,MapBrowsingView, Home01} from '@/containers';
+import { Home, NavigationView ,MapBrowsingView, Home01, ARMap} from '@/containers';
 
 const Stack = createStackNavigator();
 
@@ -29,6 +29,7 @@ export default function Root() {
         {/* <Stack.Screen name="MapView" component={MapView} /> */}
         <Stack.Screen name="NavigationView" component={NavigationView} />
         <Stack.Screen name="MapBrowsingView" component={MapBrowsingView} />
+        <Stack.Screen name="ARMap" component={ARMap} />
       </Stack.Navigator>
     </NavigationContainer>
   );
