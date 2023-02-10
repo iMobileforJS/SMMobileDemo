@@ -148,7 +148,7 @@ export default class NavigationView extends MapView<Props, State> {
     try {
 
       // 初始化导航采集数据
-      await this.initData(DEFAULT_DATA)
+      // await this.initData(DEFAULT_DATA)
 
       const home = await FileTools.appendingHomeDirectory()
 

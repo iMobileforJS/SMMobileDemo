@@ -95,7 +95,7 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
 
    addMap = async () => {
     try {
-      await this.initData(DEFAULT_DATA_MAP_FILE)
+      // await this.initData(DEFAULT_DATA_MAP_FILE)
       openTiandituMap(this, false)
     } catch (error) {
       

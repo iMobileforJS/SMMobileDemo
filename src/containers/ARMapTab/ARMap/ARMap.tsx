@@ -16,6 +16,7 @@ interface Props {
 }
 
 interface State {
+  isInit: boolean,
 	layerName: string,
   type: '' | 'rotation',
 }
@@ -30,6 +31,7 @@ export default class ARMap extends React.Component<Props, State> {
   constructor(props: Props) {
 		super(props)
 		this.state = {
+      isInit: false,
 			layerName: '',
       type: '',
 		}
@@ -38,29 +40,6 @@ export default class ARMap extends React.Component<Props, State> {
   componentDidMount() {
     // 设置位置校准
     SARMap.setPosition(0, 0, 0)
-    SARMap.addMeasureStatusListeners({
-      infoListener: result => {
-        console.warn('infoListener', result)
-        // if (result.none) {
-        //   this.onshowLog(result)
-        // }
-        // if (this.props.showARSceneNotify) {
-        //   this.onshowLog(result)
-        // }
-      },
-      addListener: async result => {
-        console.warn('addListener', result)
-        // if (result) {
-        //   if (this.state.isfirst) {
-        //     this.setState({ showADD: true, showADDPoint: true, is_showLog: true })
-        //   } else {
-        //     this.setState({ showADD: true })
-        //   }
-        // } else {
-        //   this.setState({ showADD: false, showADDPoint: false })
-        // }
-      },
-    })
   }
 
   initSetting = () => {
@@ -225,7 +204,7 @@ export default class ARMap extends React.Component<Props, State> {
             ? scaleSize(96)
             : 0,
       },
-      backAction: async event => {
+      backAction: async () => {
         await this.closeARMap()
         return this.props.navigation.goBack()
       },
@@ -243,17 +222,16 @@ export default class ARMap extends React.Component<Props, State> {
 			const userPath3d = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativeFilePath.Scene + 'ChengDuSuperMap/ChengDuSuperMap.sxwu'
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				const data = {server: path3d}
-				const importResult = await SScene.import3DWorkspace(data)
-				console.warn('导入三维数据:', importResult, path3d)
+				await SScene.import3DWorkspace(data)
 			}
 			if (!await FileTools.fileIsExist(userPath3d)) {
-				console.warn('三维数据不存在', userPath3d)
+				Toast.show('三维数据不存在')
 				return
 			}
 			// 添加三维图层
 			const addLayerName = await SARMap.addSceneLayer(AR_DATASOURCE, AR_DATASET, userPath3d)
 			if(addLayerName !== ''){
-				console.warn('添加三维图层成功', addLayerName)
+				Toast.show('添加三维图层成功: ' + addLayerName)
 				this.setState({
 					layerName: addLayerName,
 				})
@@ -268,7 +246,6 @@ export default class ARMap extends React.Component<Props, State> {
    * @returns 
    */
   renderButtons = () => {
-    // if (this.state.toobarVisible) return null
     return (
       <View
         style={{
@@ -284,9 +261,21 @@ export default class ARMap extends React.Component<Props, State> {
 					const datasourceName = AR_DATASOURCE
 					const datasetName = AR_DATASET
 					const createResult = await this.createARMap(datasourcePath, datasourceName, datasetName)
-					console.warn(createResult)
+          if (createResult.success) {
+            this.setState({
+              isInit: true,
+            }, () => {
+              Toast.show('初始化地图成功')
+            })
+          } else {
+            Toast.show('初始化地图失败')
+          }
 				})}
         {this.renderButton('添加三维', async() => {
+          if (!this.state.isInit) {
+            Toast.show('请先初始化地图')
+            return
+          }
           this.add3D()
         })}
         {this.renderButton('编辑图层', async() => {
@@ -294,18 +283,26 @@ export default class ARMap extends React.Component<Props, State> {
 						Toast.show('请先添加三位图层')
 						return
 					}
-          const a = await SARMap.appointEditAR3DLayer(this.state.layerName)
-          console.warn('指定编辑图层', this.state.layerName, a)
+          await SARMap.appointEditAR3DLayer(this.state.layerName)
           this.setState({
             type: 'rotation',
           })
 					
         })}
         {this.renderButton('保存地图', async() => {
+          if (!this.state.isInit) {
+            Toast.show('请先初始化地图')
+            return
+          }
+					if (!this.state.layerName) {
+						Toast.show('请先添加三维图层')
+						return
+					}
 		      const homePath = await FileTools.getHomeDirectory()
           const arMapPath = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativePath.ARMap + 'ChengDuSuperMap/ChengDuSuperMap.arxml'
 					const result = await this.saveAsARMap(arMapPath)
-          console.warn('保存地图', this.state.layerName, result)
+
+					Toast.show('保存地图' + (result ? '成功' : '失败'))
 					
         })}
       </View>
@@ -339,7 +336,6 @@ export default class ARMap extends React.Component<Props, State> {
           }}
           range={[-180, 180]}
           defaultMaxValue={0}
-          barColor={'#FF6E51'}
           onMove={loc => {
             const transformData: IARTransform = {
               layerName: this.state.layerName,
@@ -354,13 +350,12 @@ export default class ARMap extends React.Component<Props, State> {
               scale: 1,
               touchType: 0,
             }
-            console.warn(transformData)
             SARMap.setARElementTransform(transformData)
           }}
         />
         <TouchableOpacity
           style={{
-            backgroundColor: 'yellow',
+            backgroundColor: color.WHITE,
             justifyContent: 'center',
             alignItems: 'center',
             width: scaleSize(100),
