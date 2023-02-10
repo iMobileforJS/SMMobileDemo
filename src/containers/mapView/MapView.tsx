@@ -72,6 +72,8 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
   componentDidMount() {
     this.setGestureDetectorListener()
     SMap.setIsMagnifierEnabled(true)
+
+    console.warn('toPath')
   }
 
   componentWillUnmount() {
@@ -113,12 +115,12 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
    * @param name 数据所在文件夹的名字
    * @returns
    */
-  initData = async (name: string): Promise<void> => {
-    // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
-    const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
-    // 拷贝之后解压到 SMMobileDemo/ExternalData/（指定名字name文件夹里）
-    await AppUtils.copyAssetFileTo(`${name}.zip`, toPath)
-  }
+  // initData = async (name: string): Promise<void> => {
+  //   // 初始化数据,数据保存在SMMobileDemo/android/app/src/main/assets
+  //   const toPath = await FileTools.appendingHomeDirectory(ConstPath.ExternalData + '/')
+  //   // 拷贝之后解压到 SMMobileDemo/ExternalData/（指定名字name文件夹里）
+  //   await AppUtils.copyAssetFileTo(`${name}.zip`, toPath)
+  // }
 
   addMap = async () => {}
 
