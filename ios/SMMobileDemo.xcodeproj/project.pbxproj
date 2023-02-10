@@ -41,8 +41,8 @@
 		0A44181627CE1CE900DDF353 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181527CE1CE900DDF353 /* UIKit.framework */; };
 		0A44181827CE1CEE00DDF353 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44181727CE1CEE00DDF353 /* WebKit.framework */; };
 		0A44182827CE2A7000DDF353 /* Workspace.zip in Resources */ = {isa = PBXBuildFile; fileRef = 0A44182727CE2A7000DDF353 /* Workspace.zip */; };
-		0ADF6214299636F000171B69 /* SuperMapAR.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0ADF6213299636F000171B69 /* SuperMapAR.bundle */; };
-		0ADF62162996376900171B69 /* resources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0ADF62152996376900171B69 /* resources.bundle */; };
+		0AA85F2327D5D4520067CB94 /* AppUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 0AA85F2127D5D4520067CB94 /* AppUtils.m */; };
+		0AA861B127D5E4FE0067CB94 /* resources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 0AA861B027D5E4FE0067CB94 /* resources.bundle */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -120,9 +120,10 @@
 		0A44181527CE1CE900DDF353 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		0A44181727CE1CEE00DDF353 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		0A44182727CE2A7000DDF353 /* Workspace.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = Workspace.zip; sourceTree = "<group>"; };
+		0AA85F2127D5D4520067CB94 /* AppUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppUtils.m; sourceTree = "<group>"; };
+		0AA85F2227D5D4520067CB94 /* AppUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppUtils.h; sourceTree = "<group>"; };
 		0AA85F3B27D5D6300067CB94 /* SMSuperMap.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMSuperMap.xcodeproj; path = ../node_modules/imobile_for_reactnative/ios/SMSuperMap.xcodeproj; sourceTree = "<group>"; };
-		0ADF6213299636F000171B69 /* SuperMapAR.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SuperMapAR.bundle; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/SuperMapAR.bundle; sourceTree = "<group>"; };
-		0ADF62152996376900171B69 /* resources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = resources.bundle; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/resources.bundle; sourceTree = "<group>"; };
+		0AA861B027D5E4FE0067CB94 /* resources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = resources.bundle; path = ../node_modules/imobile_for_reactnative/ios/assets/resources.bundle; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* SMMobileDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SMMobileDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = SMMobileDemo/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = SMMobileDemo/AppDelegate.m; sourceTree = "<group>"; };
@@ -205,6 +206,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		0AA85F2027D5D4520067CB94 /* rn */ = {
+			isa = PBXGroup;
+			children = (
+				0AA85F2127D5D4520067CB94 /* AppUtils.m */,
+				0AA85F2227D5D4520067CB94 /* AppUtils.h */,
+			);
+			path = rn;
+			sourceTree = "<group>";
+		};
 		0AA85F3C27D5D6300067CB94 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,6 +234,7 @@
 		13B07FAE1A68108700A75B9A /* SMMobileDemo */ = {
 			isa = PBXGroup;
 			children = (
+				0AA85F2027D5D4520067CB94 /* rn */,
 				0AF4856727BF8E2E0087F871 /* assets */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -243,8 +254,6 @@
 				0A210D502991E5A30027BEB7 /* JKVValue.framework */,
 				0A210D4E2991E5A20027BEB7 /* RMQClient.framework */,
 				0A210D512991E5A30027BEB7 /* ZipArchive.framework */,
-				0ADF62152996376900171B69 /* resources.bundle */,
-				0ADF6213299636F000171B69 /* SuperMapAR.bundle */,
 				479B835C289289CE0008824B /* SuperMap.bundle */,
 				0A44181727CE1CEE00DDF353 /* WebKit.framework */,
 				0A44181527CE1CE900DDF353 /* UIKit.framework */,
@@ -297,6 +306,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				0AA861B027D5E4FE0067CB94 /* resources.bundle */,
 				13B07FAE1A68108700A75B9A /* SMMobileDemo */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* SMMobileDemoTests */,
@@ -429,10 +439,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0ADF6214299636F000171B69 /* SuperMapAR.bundle in Resources */,
+				0AA861B127D5E4FE0067CB94 /* resources.bundle in Resources */,
 				0A44182827CE2A7000DDF353 /* Workspace.zip in Resources */,
 				479B835D289289CF0008824B /* SuperMap.bundle in Resources */,
-				0ADF62162996376900171B69 /* resources.bundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
@@ -602,6 +611,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				0AA85F2327D5D4520067CB94 /* AppUtils.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -684,7 +694,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = URZW253WPZ;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -778,7 +788,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = URZW253WPZ;
-				ENABLE_BITCODE = NO;
+				ENABLE_BITCODE = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
