@@ -1,5 +1,5 @@
 import { Button, Container, SlideBar } from '@/components'
-import { DatasetType, EngineType, FileTools, IARTransform, SARMap, SMap, SMARMapView, SScene } from 'imobile_for_reactnative'
+import { DatasetType, EngineType, FileTools, IARTransform, SARMap, SMap, SMARMapView, SScene, SAIDetectView } from 'imobile_for_reactnative'
 import React from 'react'
 import { Image, Platform, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
@@ -16,6 +16,7 @@ interface Props {
 }
 
 interface State {
+  isAvailable: boolean,
 	layerName: string,
   type: '' | 'rotation',
 }
@@ -30,37 +31,31 @@ export default class ARMap extends React.Component<Props, State> {
   constructor(props: Props) {
 		super(props)
 		this.state = {
+      isAvailable: false,
 			layerName: '',
       type: '',
 		}
 	}
 
-  componentDidMount() {
+  async componentDidMount() {
+    // ARView系统版本是否支持 Anroid Only
+    const isAvailable = await SAIDetectView.checkIfAvailable()
+    if (!isAvailable) {
+      Toast.show('该设备不支持AR')
+      return false
+    }
+    // ARView需要的传感器是否可用
+    if (await SAIDetectView.checkIfSensorsAvailable()) {
+      this.setState({
+        isAvailable: true,
+      })
+      return
+    } else {
+      Toast.show('该设备不支持AR')
+      return false
+    }
     // 设置位置校准
     SARMap.setPosition(0, 0, 0)
-    SARMap.addMeasureStatusListeners({
-      infoListener: result => {
-        console.warn('infoListener', result)
-        // if (result.none) {
-        //   this.onshowLog(result)
-        // }
-        // if (this.props.showARSceneNotify) {
-        //   this.onshowLog(result)
-        // }
-      },
-      addListener: async result => {
-        console.warn('addListener', result)
-        // if (result) {
-        //   if (this.state.isfirst) {
-        //     this.setState({ showADD: true, showADDPoint: true, is_showLog: true })
-        //   } else {
-        //     this.setState({ showADD: true })
-        //   }
-        // } else {
-        //   this.setState({ showADD: false, showADDPoint: false })
-        // }
-      },
-    })
   }
 
   initSetting = () => {
@@ -195,6 +190,7 @@ export default class ARMap extends React.Component<Props, State> {
    * @returns 
    */
   renderARView = () => {
+    if (!this.state.isAvailable) return null
     return (
       <SMARMapView
         moduleId={255}
