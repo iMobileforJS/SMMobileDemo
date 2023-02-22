@@ -1,4 +1,4 @@
-import screen, { scaleSize, setSpText } from './screen'
+import screen, { scaleSize, setSpText, dp } from './screen'
 import Toast from './Toast'
 import * as NavigationService from './NavigationService'
 import ModelUtils from './ModelUtils'
@@ -13,6 +13,7 @@ export {
   screen,
   scaleSize,
   setSpText,
+  dp,
   Toast,
   NavigationService,
   ModelUtils,
