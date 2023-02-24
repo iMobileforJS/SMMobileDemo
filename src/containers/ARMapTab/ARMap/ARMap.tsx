@@ -1,5 +1,5 @@
 import { Button, Container, SlideBar } from '@/components'
-import { DatasetType, EngineType, FileTools, IARTransform, SARMap, SMap, SMARMapView, SScene, SAIDetectView } from 'imobile_for_reactnative'
+import { DatasetType, EngineType, FileTools, IARTransform, SARMap, SMap, SMARMapView, SScene, SAIDetectView, ARAction, GeoStyle3D } from 'imobile_for_reactnative'
 import React from 'react'
 import { Image, Platform, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
@@ -9,6 +9,9 @@ import { ConstPath } from '@/constants'
 import { color } from '@/styles'
 import { getAssets } from '@/assets'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { ARAttributeTable } from '@/containers/components'
+import { ARAttributeType } from '@/containers/components/ARAttributeTable/ARAttributeTable'
+import wangge from './wangge.json'
 
 interface Props {
 	navigation: any,
@@ -18,24 +21,32 @@ interface Props {
 interface State {
   isAvailable: boolean,
   isInit: boolean,
+	name3D: string,
 	layerName: string,
   type: '' | 'rotation',
+  attribute: Array<ARAttributeType>,
 }
 
 const AR_DATASOURCE = 'ARDatasource'
 const AR_DATASET = 'ARDataset'
+const AR_DATASOURCE_1 = 'ARDatasource_1'
+const AR_DATASET_1 = 'ARDataset_1'
 const USERNAME = 'Customer'
 
 export default class ARMap extends React.Component<Props, State> {
   container: ContainerType | undefined | null
+
+  visible: boolean = true
 
   constructor(props: Props) {
 		super(props)
 		this.state = {
       isAvailable: false,
       isInit: false,
+			name3D: '',
 			layerName: '',
       type: '',
+      attribute: [],
 		}
 	}
 
@@ -51,13 +62,37 @@ export default class ARMap extends React.Component<Props, State> {
       this.setState({
         isAvailable: true,
       })
-      return
     } else {
       Toast.show('该设备不支持AR')
       return false
     }
     // 设置位置校准
     SARMap.setPosition(0, 0, 0)
+
+     // }
+    await SARMap.addAttributeListener({
+      callback: async (result: any) => {
+        try {
+          const arr: Array<ARAttributeType> = []
+          if (result) {
+            const keys = Object.keys(result)
+            keys.forEach(key => {
+              arr.push({
+                title: key,
+                value: result[key],
+              })
+            })
+          }
+          this.setState({
+            attribute: arr,
+          })
+        } catch (error) {
+          this.setState({
+            attribute: [],
+          })
+        }
+      },
+    })
   }
 
   initSetting = () => {
@@ -233,12 +268,14 @@ export default class ARMap extends React.Component<Props, State> {
   }
 
 	/** 添加三维图层 */
-  add3D = async () => {
+  add3D = async (datasourceName: string, datasetName: string, name: string) => {
 		const homePath = await FileTools.getHomeDirectory()
 		// 得到的是工作空间所在目录 需要去找到sxwu文件路径
 		try {
-			const path3d = homePath + ConstPath.ExternalData + '/ChengDuSuperMap/ChengDuSuperMap.sxwu'
-			const userPath3d = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativeFilePath.Scene + 'ChengDuSuperMap/ChengDuSuperMap.sxwu'
+			// const path3d = homePath + ConstPath.ExternalData + '/ChengDuSuperMap/ChengDuSuperMap.sxwu'
+			// const userPath3d = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativeFilePath.Scene + 'ChengDuSuperMap/ChengDuSuperMap.sxwu'
+			const path3d = `${homePath + ConstPath.ExternalData}/${name}/${name}.sxwu`
+			const userPath3d = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${name}/${name}.sxwu`
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				const data = {server: path3d}
 				await SScene.import3DWorkspace(data)
@@ -248,17 +285,61 @@ export default class ARMap extends React.Component<Props, State> {
 				return
 			}
 			// 添加三维图层
-			const addLayerName = await SARMap.addSceneLayer(AR_DATASOURCE, AR_DATASET, userPath3d)
+			const addLayerName = await SARMap.addSceneLayer(datasourceName, datasetName, userPath3d)
+			if(addLayerName !== ''){
+				Toast.show('添加三维图层成功: ' + addLayerName)
+				this.setState({
+          name3D: name,
+					layerName: addLayerName,
+				})
+			}
+      SARMap.setAction(ARAction.NULL)
+		} catch(e){
+			Toast.show('添加失败')
+		}
+  }
+
+	/** 添加Online三维图层 */
+  add3DOnline = async (url: string, name: string) => {
+		try {
+			const addLayerName = await SARMap.addSceneLayerOnline(AR_DATASOURCE + 1, AR_DATASET + 1, url, name)
 			if(addLayerName !== ''){
 				Toast.show('添加三维图层成功: ' + addLayerName)
 				this.setState({
 					layerName: addLayerName,
 				})
 			}
+      SARMap.setAction(ARAction.SELECT)
 		} catch(e){
 			Toast.show('添加失败')
 		}
   }
+
+  getOnlineSceneFromUrl = (url: string): { serverUrl: string, datasetUrl: string, sceneName: string } => {
+    const pattern = /(.+\/services)\/3D-(.+)\/rest\/realspace\/scenes\/(.+)/
+    const result = url.match(pattern)
+    let servicesUrl = ''
+    let workspaceName = ''
+    let sceneName = ''
+    if (result) {
+      servicesUrl = result[1]
+      workspaceName = result[2]
+      sceneName = result[3]
+      const pat2 = /(.+)\.openrealspace$/
+      const result2 = sceneName.match(pat2)
+      if (result2) {
+        sceneName = result2[1]
+      }
+    }
+    return {
+      //http://192.168.11.117:8090/iserver/services/3D-pipe3D/rest/realspace
+      serverUrl: servicesUrl + `/3D-${workspaceName}/rest/realspace`,
+      //http://192.168.11.117:8090/iserver/services/data-DataSource2/rest/data/datasources/AR_SCENE/datasets/AR_SCENE'
+      datasetUrl: servicesUrl + `/data-${workspaceName}/rest/data/datasources/AR_SCENE/datasets/AR_SCENE111`,
+      sceneName, //: 'pipe3D',
+    }
+  }
+
 
   /**
    * 右边按钮
@@ -269,7 +350,7 @@ export default class ARMap extends React.Component<Props, State> {
       <View
         style={{
           position: 'absolute',
-          right: 20,
+          right: 10,
           top: 60 + screen.getIphonePaddingTop(),
           backgroundColor: 'transparent',
         }}
@@ -280,6 +361,16 @@ export default class ARMap extends React.Component<Props, State> {
 					const datasourceName = AR_DATASOURCE
 					const datasetName = AR_DATASET
 					const createResult = await this.createARMap(datasourcePath, datasourceName, datasetName)
+
+          const wgPath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.Scene + '/地砖模型03/wangge'
+          const r = await SMap.openDatasource({
+            server: wgPath + '.udb',
+            engineType: EngineType.UDB,
+            alias: 'wangge',
+          }, 0)
+          console.warn('打开wangge', r ? '成功' : '失败')
+
+					// await this.createARMap(datasourcePath, datasourceName + 1, datasetName + 1)
           if (createResult.success) {
             this.setState({
               isInit: true,
@@ -290,13 +381,32 @@ export default class ARMap extends React.Component<Props, State> {
             Toast.show('初始化地图失败')
           }
 				})}
-        {this.renderButton('添加三维', async() => {
+        {/* {this.renderButton('添加大厦', async() => {
           if (!this.state.isInit) {
             Toast.show('请先初始化地图')
             return
           }
-          this.add3D()
+          /this.add3D(AR_DATASOURCE, AR_DATASET, 'ChengDuSuperMap')
+          const { serverUrl, sceneName, datasetUrl } = this.getOnlineSceneFromUrl("http://10.10.3.106:8090/iserver/services/3D-DiZhuanMoXing03/rest/realspace/scenes/地砖模型03")
+          const addLayerName = await SARMap.addSceneLayerOnline(AR_DATASOURCE_1, AR_DATASET_1, serverUrl, sceneName)
+        })} */}
+        {this.renderButton('添加地砖', async() => {
+          if (!this.state.isInit) {
+            Toast.show('请先初始化地图')
+            return
+          }
+          this.add3D(AR_DATASOURCE, AR_DATASET, '地砖模型03')
         })}
+        {/* {this.renderButton('添加Online', async() => {
+          if (!this.state.isInit) {
+            Toast.show('请先初始化地图')
+            return
+          }
+          // this.add3D(AR_DATASOURCE + 1, AR_DATASET + 1, '地砖模型03')
+          const url = 'http://10.10.3.106:8090/iserver/services/3D-DiZhuanMoXing03/rest/realspace/scenes/地砖模型03'
+			    const sceneName = url.substring(url.lastIndexOf('/') + 1)
+          this.add3DOnline('http://192.168.11.21:8090/iserver/services/3D-DiZhuanMoXing03/rest/realspace', sceneName)
+        })} */}
         {this.renderButton('编辑图层', async() => {
 					if (!this.state.layerName) {
 						Toast.show('请先添加三位图层')
@@ -308,17 +418,63 @@ export default class ARMap extends React.Component<Props, State> {
           })
 					
         })}
-        {this.renderButton('保存地图', async() => {
-          if (!this.state.isInit) {
-            Toast.show('请先初始化地图')
+        {this.renderButton('添加KML图层', async() => {
+          if (!this.state.layerName) {
+            Toast.show('请先添加三位图层')
             return
           }
+          const layerName = 'OverlayKML'
+
+          const geometries = wangge.geometries
+
+          // 自定义颜色示例
+          // for(const geometrie of geometries) {
+          //   const style = new GeoStyle3D()
+          //   style.setAltitudeMode(2)
+          //   style.setFillForeColor(255, 0, 0, 1)
+          //   geometrie.style = style
+          // }
+
+          const dataJson = {
+            layerName: layerName,
+            geometries: geometries,
+          }
+          const homePath = await FileTools.getHomeDirectory()
+          const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${this.state.name3D}/kml/files/${this.state.name3D}.kml`
+
+
+          const _layerName = await SARMap.addSceneLayerKMLByJson(JSON.stringify(dataJson), kmlPath, 'OverlayKML')
+          console.warn('添加成功', _layerName)
+        })}
+        {this.renderButton('移除KML图层', async() => {
 					if (!this.state.layerName) {
-						Toast.show('请先添加三维图层')
+						Toast.show('请先添加三位图层')
 						return
 					}
+          // this.visible = !this.visible
+          // await SARMap.setLayerVisible(this.state.layerName, this.visible)
+          await SARMap.removeSceneLayer('OverlayKML')
+					
+        })}
+        {this.renderButton('保存KML', async() => {
+
+          const homePath = await FileTools.getHomeDirectory()
+          const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${this.state.name3D}/kml/files/${this.state.name3D}.kml`
+          await SARMap.saveSceneLayerKML('OverlayKML', kmlPath)
+					
+        })}
+        {this.renderButton('保存地图', async() => {
+          // if (!this.state.isInit) {
+          //   Toast.show('请先初始化地图')
+          //   return
+          // }
+					// if (!this.state.layerName) {
+					// 	Toast.show('请先添加三维图层')
+					// 	return
+					// }
 		      const homePath = await FileTools.getHomeDirectory()
-          const arMapPath = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativePath.ARMap + 'ChengDuSuperMap/ChengDuSuperMap.arxml'
+          // const arMapPath = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativePath.ARMap + 'ChengDuSuperMap/ChengDuSuperMap.arxml'
+          const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + this.state.layerName}/${this.state.layerName}.arxml`
 					const result = await this.saveAsARMap(arMapPath)
 
 					Toast.show('保存地图' + (result ? '成功' : '失败'))
@@ -328,6 +484,7 @@ export default class ARMap extends React.Component<Props, State> {
     )
   }
 
+  /** 编辑指滑界面 */
   renderSliderBar = () => {
     return (
       <View
@@ -398,6 +555,14 @@ export default class ARMap extends React.Component<Props, State> {
     )
   }
 
+  /** 属性表 */
+  renderARAttribute = () => {
+    if (this.state.attribute.length <= 0) return null
+    return (
+      <ARAttributeTable attribute={this.state.attribute} />
+    )
+  }
+
   render() {
     return (
       <Container
@@ -411,6 +576,7 @@ export default class ARMap extends React.Component<Props, State> {
         {/* <View style={{flex: 1, backgroundColor:'yellow'}}></View> */}
         {this.renderARView()}
         {this.renderButtons()}
+        {this.renderARAttribute()}
         {this.state.type === 'rotation' && this.renderSliderBar()}
       </Container>
     )
