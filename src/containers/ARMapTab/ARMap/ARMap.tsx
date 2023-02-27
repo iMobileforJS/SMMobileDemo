@@ -294,6 +294,17 @@ export default class ARMap extends React.Component<Props, State> {
 				})
 			}
       SARMap.setAction(ARAction.NULL)
+
+      const wgPath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.Scene + '/地砖模型03/wangge'
+      const wanggeInfo = {
+        server: wgPath + '.udb',
+        engineType: EngineType.UDB,
+        alias: 'wangge',
+      }
+      if (userPath3d && await FileTools.fileIsExist(wgPath) && !(await SMap.isDatasourceOpen(wanggeInfo))) {
+        const r = await SMap.openDatasource(wanggeInfo, 0)
+        console.warn('打开wangge', r ? '成功' : '失败')
+      }
 		} catch(e){
 			Toast.show('添加失败')
 		}
@@ -362,14 +373,6 @@ export default class ARMap extends React.Component<Props, State> {
 					const datasetName = AR_DATASET
 					const createResult = await this.createARMap(datasourcePath, datasourceName, datasetName)
 
-          const wgPath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.Scene + '/地砖模型03/wangge'
-          const r = await SMap.openDatasource({
-            server: wgPath + '.udb',
-            engineType: EngineType.UDB,
-            alias: 'wangge',
-          }, 0)
-          console.warn('打开wangge', r ? '成功' : '失败')
-
 					// await this.createARMap(datasourcePath, datasourceName + 1, datasetName + 1)
           if (createResult.success) {
             this.setState({
@@ -395,7 +398,7 @@ export default class ARMap extends React.Component<Props, State> {
             Toast.show('请先初始化地图')
             return
           }
-          this.add3D(AR_DATASOURCE, AR_DATASET, '地砖模型03')
+          await this.add3D(AR_DATASOURCE, AR_DATASET, '地砖模型03')
         })}
         {/* {this.renderButton('添加Online', async() => {
           if (!this.state.isInit) {
