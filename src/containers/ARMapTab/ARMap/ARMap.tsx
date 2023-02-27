@@ -295,16 +295,16 @@ export default class ARMap extends React.Component<Props, State> {
 			}
       SARMap.setAction(ARAction.NULL)
 
-      const wgPath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.Scene + '/地砖模型03/wangge'
-      const wanggeInfo = {
-        server: wgPath + '.udb',
-        engineType: EngineType.UDB,
-        alias: 'wangge',
-      }
-      if (userPath3d && await FileTools.fileIsExist(wgPath) && !(await SMap.isDatasourceOpen(wanggeInfo))) {
-        const r = await SMap.openDatasource(wanggeInfo, 0)
-        console.warn('打开wangge', r ? '成功' : '失败')
-      }
+      // const wgPath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.Scene + '/地砖模型03/wangge'
+      // const wanggeInfo = {
+      //   server: wgPath + '.udb',
+      //   engineType: EngineType.UDB,
+      //   alias: 'wangge',
+      // }
+      // if (userPath3d && await FileTools.fileIsExist(wgPath) && !(await SMap.isDatasourceOpen(wanggeInfo))) {
+      //   const r = await SMap.openDatasource(wanggeInfo, 0)
+      //   console.warn('打开wangge', r ? '成功' : '失败')
+      // }
 		} catch(e){
 			Toast.show('添加失败')
 		}
