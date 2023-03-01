@@ -1,4 +1,5 @@
-<h1 align="center">SuperMap Mobile Demo指南</h1>
+<h1 align="center">SuperMap iMobile for RN 示范工程部署指南
+</h1>
 
 ### 一. 初始化Demo
 #### 1. 下载
