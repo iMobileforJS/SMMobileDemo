@@ -18,7 +18,7 @@ import {
   View,
   Button,
 } from 'react-native';
-import { SMap, AppInfo, FileTools, SLocation, WorkspaceType } from 'imobile_for_reactnative'
+import { SData, SMap, AppInfo, FileTools, SLocation, WorkspaceType } from 'imobile_for_reactnative'
 import Root from '@/Root'
 import { ConstPath, DEFAULT_USER_NAME, DEFAULT_LANGUAGE } from '@/constants'
 import Orientation from 'react-native-orientation'
@@ -102,11 +102,11 @@ class AppRoot extends React.Component<Props, State> {
     try {
       this.Loading?.setLoading(true, '初始化中')
       this.initOrientation()
-      Platform.OS === 'android' && await SMap.setPermisson(true) // 权限申请
+      // Platform.OS === 'android' && await SData.setPermisson(true) // 权限申请
       await this.initEnvironment() // 初始化环境
-      SMap.setModuleListener(this.onInvalidModule)
-      SMap.setLicenseListener(this.onInvalidLicense)
-      await SMap.initMapView() // 初始化唯一地图组件
+      SData.setModuleListener(this.onInvalidModule)
+      SData.setLicenseListener(this.onInvalidLicense)
+      // await SData.initMapView() // 初始化唯一地图组件
       await this.initLocation() // 打开GPS
       await this.openWorkspace() // 打开工作空间
 
@@ -137,7 +137,7 @@ class AppRoot extends React.Component<Props, State> {
    */
   initEnvironment = async () => {
     try {
-      await SMap.initEnvironment(ConstPath.AppPath) // 初始化环境
+      // await SData.initEnvironment(ConstPath.AppPath) // 初始化环境
       await AppInfo.setRootPath('/' + ConstPath.AppPath.replace(/\//g, '')) // 设置根目录名
       await AppInfo.setUserName(DEFAULT_USER_NAME) // 初始化用户
       await FileTools.initUserDefaultData(DEFAULT_USER_NAME) // 初始化文件目录
@@ -191,11 +191,13 @@ class AppRoot extends React.Component<Props, State> {
       // const path = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/DefaultData/Workspace/Workspace.sxwu`
       // const path = `${home + ConstPath.ExternalData}/Navigation_EXAMPLE/beijing.smwu`
       // const path = `${home + ConstPath.ExternalData}/kk/kk.smwu`
-      let wsPath = ConstPath.CustomerPath + ConstPath.RelativeFilePath.Workspace[DEFAULT_LANGUAGE], path = await FileTools.getHomeDirectory() + wsPath
+      // let wsPath = ConstPath.CustomerPath + ConstPath.RelativeFilePath.Workspace[DEFAULT_LANGUAGE], path = await FileTools.getHomeDirectory() + wsPath
 
-      if (await FileTools.fileIsExist(path)) {
-        const result = await SMap.openWorkspace({ server: path })
-      }
+      // if (await FileTools.fileIsExist(path)) {
+      //   const result = await SMap.openWorkspace({ server: path })
+      // }
+      console.warn('initUserWorkspace')
+      const result = await SData.initUserWorkspace()
 
     } catch(e) {
       console.warn('openWorkspace error')

@@ -25,6 +25,12 @@ class Home01 extends Component<Props, State> {
     }
   }
 
+  async componentDidMount() {
+    if (await LicenseUtil.loginCloudLicense('13684098564', '12345678')) {
+      Toast.show('激活成功')
+    }
+  }
+
   /** 申请许可 */
   license = () => {
     this.showLicense(true)

@@ -22,10 +22,10 @@
  * 
  */
 
-import { SMap } from "imobile_for_reactnative"
+import { SData } from "imobile_for_reactnative"
 import Toast from "./Toast"
 
-interface licenseResultType extends SMap.QueryCloudLicenseResult{
+interface licenseResultType extends SData.QueryCloudLicenseResult{
   isStaff?: boolean,
 }
 
@@ -52,7 +52,7 @@ async function activateLicense(code: string): Promise<boolean>{
       Toast.show('当前已有许可被激活')
       return false
     }
-    const result = await SMap.activateLicense(code)
+    const result = await SData.activateLicense(code)
     if(result) {
       Toast.show('激活成功')
       licenseCurrentType = 'offline'
@@ -74,7 +74,7 @@ async function activateLicense(code: string): Promise<boolean>{
  */
 async function reloadLocalLicense(): Promise<void>{
   try {
-    const result = await SMap.reloadLocalLicense()
+    const result = await SData.reloadLocalLicense()
     if(result) {
       licenseCurrentType = 'offline'
     } else {
@@ -101,11 +101,11 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
 
     let flag = false
     // 设置云许可站点
-    await SMap.setCloudLicenseSite('DEFAULT')
+    await SData.setCloudLicenseSite('DEFAULT')
     await logoutCloudLicense()
 
     // 登录云许可
-    let loginResult = await SMap.loginCloudLicense(user, pwd)
+    let loginResult = await SData.loginCloudLicense(user, pwd)
 
     let timeout = (sec: number) => {
       return new Promise(resolve => {
@@ -154,7 +154,7 @@ async function queryCloudLicense(): Promise<licenseResultType | null | undefined
     let licenseResult: licenseResultType | null | undefined
     try {
     // 查询许可
-      licenseResult = await SMap.queryCloudLicense()
+      licenseResult = await SData.queryCloudLicense()
     } catch (error) {
       licenseResult = {
         licenses: [],
@@ -170,7 +170,7 @@ async function queryCloudLicense(): Promise<licenseResultType | null | undefined
     licenseResult.isStaff = false
     if(licenseResult.licenses.length === 0) {
       // 查询是否包含试用许可和员工许可
-      const queryResult = await SMap.queryCloudTrialLicense()
+      const queryResult = await SData.queryCloudTrialLicense()
       licenseResult.isStaff = queryResult.staff
     }
     return licenseResult
@@ -188,7 +188,7 @@ async function applyCloudTrialLicense(): Promise<boolean> {
   try {
     let flag = false
     // 激活云许可
-    let activeResult = await SMap.applyCloudTrialLicense()
+    let activeResult = await SData.applyCloudTrialLicense()
     if(!activeResult) {
       Toast.show("激活失败")
       licenseCurrentType = null
@@ -214,10 +214,10 @@ async function applyCloudTrialLicense(): Promise<boolean> {
   try {
     if(licenseCurrentType === 'offline'){
       // 归还离线许可
-      let serialNumber = await SMap.initSerialNumber('')
+      let serialNumber = await SData.initSerialNumber('')
       if (serialNumber !== '') {
-        // await SMap.reloadLocalLicense()
-        let result = await SMap.recycleLicense()
+        // await SData.reloadLocalLicense()
+        let result = await SData.recycleLicense()
         if(result) {
           licenseCurrentType = null
           Toast.show("归还离线许可成功")
@@ -226,7 +226,7 @@ async function applyCloudTrialLicense(): Promise<boolean> {
         }
       } else {
         // 清除本地许可文件
-        let result = await SMap.clearLocalLicense()
+        let result = await SData.clearLocalLicense()
         if(result) {
           licenseCurrentType = null
           Toast.show("归还离线许可成功")
@@ -238,7 +238,7 @@ async function applyCloudTrialLicense(): Promise<boolean> {
       
     } else if(licenseCurrentType === 'cloud') {
       // 归还云许可
-      let days = await SMap.recycleCloudLicense('', '')
+      let days = await SData.recycleCloudLicense('', '')
       if(days < 0) {
         Toast.show("归还云许可失败")
       } else {
@@ -260,7 +260,7 @@ async function applyCloudTrialLicense(): Promise<boolean> {
  */
 async function logoutCloudLicense(): Promise<void> {
   try {
-    SMap.logoutCloudLicense()
+    SData.logoutCloudLicense()
   } catch (error) {
     console.warn("登出失败")
   }

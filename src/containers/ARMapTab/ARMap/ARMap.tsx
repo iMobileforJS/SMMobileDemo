@@ -1,5 +1,5 @@
 import { Button, Container, SlideBar } from '@/components'
-import { DatasetType, EngineType, FileTools, IARTransform, SARMap, SMap, SMARMapView, SScene, SAIDetectView, ARAction, GeoStyle3D } from 'imobile_for_reactnative'
+import { FileTools, SARMap, SData, SMARMapView, SScene, SAIDetectView } from 'imobile_for_reactnative'
 import React from 'react'
 import { Image, Platform, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
@@ -12,6 +12,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { ARAttributeTable } from '@/containers/components'
 import { ARAttributeType } from '@/containers/components/ARAttributeTable/ARAttributeTable'
 import wangge from './wangge.json'
+import { DatasetType, EngineType, Vector3 } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
+import { ARAction, IARTransform } from 'imobile_for_reactnative/NativeModule/interfaces/ar/SARMap'
 
 interface Props {
 	navigation: any,
@@ -25,6 +27,7 @@ interface State {
 	layerName: string,
   type: '' | 'rotation',
   attribute: Array<ARAttributeType>,
+  position: Vector3,
 }
 
 const AR_DATASOURCE = 'ARDatasource'
@@ -47,6 +50,7 @@ export default class ARMap extends React.Component<Props, State> {
 			layerName: '',
       type: '',
       attribute: [],
+      position: {x: 0, y: 0, z: 0},
 		}
 	}
 
@@ -125,37 +129,37 @@ export default class ARMap extends React.Component<Props, State> {
 
 			if(!exist) {
 				//不存在，创建并打开
-				result = await SMap.createDatasource({
+				datasourceName = await SData.createDatasource({
 					alias: datasourceName,
 					server: server,
 					engineType: EngineType.UDB,
 				})
 			} else {
 				//存在，检查是否打开
-				const wsds = await SMap.getDatasources()
+				const wsds = await SData.getDatasources()
 				const opends = wsds.filter(item => {
 					return item.server === server
 				})
 				//未打开则在此打开
 				if(opends.length === 0) {
-					result = !!await SMap.openDatasource({
+					result = !!await SData.openDatasource({
 						alias: datasourceName,
 						server: server,
 						engineType: EngineType.UDB,
-					}, -1)
+					})
 				} else {
 					result = true
 				}
 			}
 			if(result) {
 				//检查打开的数据源中是否有默认的数据集
-				const dsets = await SMap.getDatasetsByDatasource({alias: datasourceName})
-				const defualtDset = dsets.list.filter(item => {
+				const dsets = await SData.getDatasetsByDatasource({alias: datasourceName})
+				const defualtDset = dsets.filter(item => {
 					return item.datasetName === datasetName
 				})
 				//没有则创建
 				if(defualtDset.length === 0) {
-					result = await SMap.createDataset(datasourceName, datasetName, DatasetType.PointZ)
+					result = await SData.createDataset(datasourceName, datasetName, DatasetType.PointZ)
 				} else {
 					// //重名则创建新的数据集
 					// if(newDataset) {
@@ -479,6 +483,21 @@ export default class ARMap extends React.Component<Props, State> {
 
 					Toast.show('保存地图' + (result ? '成功' : '失败'))
 					
+        })}
+        {this.renderButton('修改坐标', async() => {
+          // 指定要修改位置的图层
+          await SARMap.appointEditAR3DLayer(this.state.layerName)
+          const _position = Object.assign({}, this.state.position)
+          _position.x = _position.x === 0.5 ? 0 : 0.5
+          _position.y = _position.y === 0.5 ? 0 : 0.5
+          _position.z = _position.z === 0.5 ? 0 : 0.5
+          // 修改图层/对象位置
+          await SARMap.setARElementPosition({
+            layerName: this.state.layerName,
+          }, _position)
+          this.setState({
+            position: _position,
+          })
         })}
       </View>
     )
