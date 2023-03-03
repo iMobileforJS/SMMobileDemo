@@ -18,9 +18,9 @@ import {
   View,
   Button,
 } from 'react-native';
-import { SData, SMap, AppInfo, FileTools, SLocation, WorkspaceType } from 'imobile_for_reactnative'
+import { SData, AppInfo, FileTools, SLocation } from 'imobile_for_reactnative'
 import Root from '@/Root'
-import { ConstPath, DEFAULT_USER_NAME, DEFAULT_LANGUAGE } from '@/constants'
+import { ConstPath, DEFAULT_USER_NAME } from '@/constants'
 import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
 import { Dialog } from '@/components';
@@ -137,7 +137,6 @@ class AppRoot extends React.Component<Props, State> {
    */
   initEnvironment = async () => {
     try {
-      // await SData.initEnvironment(ConstPath.AppPath) // 初始化环境
       await AppInfo.setRootPath('/' + ConstPath.AppPath.replace(/\//g, '')) // 设置根目录名
       await AppInfo.setUserName(DEFAULT_USER_NAME) // 初始化用户
       await FileTools.initUserDefaultData(DEFAULT_USER_NAME) // 初始化文件目录
@@ -187,16 +186,6 @@ class AppRoot extends React.Component<Props, State> {
   openWorkspace = async () => {
     try {
       const home = await FileTools.appendingHomeDirectory()
-
-      // const path = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/DefaultData/Workspace/Workspace.sxwu`
-      // const path = `${home + ConstPath.ExternalData}/Navigation_EXAMPLE/beijing.smwu`
-      // const path = `${home + ConstPath.ExternalData}/kk/kk.smwu`
-      // let wsPath = ConstPath.CustomerPath + ConstPath.RelativeFilePath.Workspace[DEFAULT_LANGUAGE], path = await FileTools.getHomeDirectory() + wsPath
-
-      // if (await FileTools.fileIsExist(path)) {
-      //   const result = await SMap.openWorkspace({ server: path })
-      // }
-      console.warn('initUserWorkspace')
       const result = await SData.initUserWorkspace()
 
     } catch(e) {

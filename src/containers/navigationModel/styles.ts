@@ -7,7 +7,7 @@ export default StyleSheet.create({
   buttons: {
     position: 'absolute',
     right: scaleSize(34),
-    top: scaleSize(143),
+    top: scaleSize(150),
     width: scaleSize(80),
     paddingVertical: scaleSize(20),
     flexDirection: 'column',

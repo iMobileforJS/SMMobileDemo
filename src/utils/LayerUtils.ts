@@ -1,4 +1,5 @@
-import { DatasetType, SMap } from "imobile_for_reactnative"
+import { SMap } from "imobile_for_reactnative"
+import { DatasetType } from "imobile_for_reactnative/NativeModule/interfaces/data/SData"
 
 const baseMapsOrigin = [
   'roadmap@GoogleMaps',

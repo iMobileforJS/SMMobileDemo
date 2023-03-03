@@ -9,8 +9,8 @@
  * 
  */
 import React from 'react'
-import { SMMapView, SMap, FileTools, WorkspaceType, SMediaCollector, DatasetType, RNFS as fs } from 'imobile_for_reactnative'
-import { ConstPath, DEFAULT_USER_NAME, TouchMode, DEFAULT_LANGUAGE } from '@/constants'
+import { SMMapView, SMap, FileTools, SMediaCollector, RNFS as fs, SData } from 'imobile_for_reactnative'
+import { DEFAULT_USER_NAME, TouchMode } from '@/constants'
 import { Container } from '@/components'
 import { Props as HeaderProps } from '@/components/Header/Header'
 import ContainerType from '@/components/Container/Container'
@@ -19,10 +19,8 @@ import { scaleSize, TouchAction } from '@/utils'
 import { Extra } from '@/components/Container/Loading'
 import { MapViewProps } from './types'
 import Toast from 'react-native-root-toast'
-import { DatasourceConnectionInfo } from 'imobile_for_reactnative/types/data'
 import License  from '../../components/License'
-import { NativeModules } from 'react-native'
-let AppUtils = NativeModules.AppUtils
+import { WorkspaceType, DatasetType, DatasourceConnectionInfo } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
 
 // 离线地图数据类型
 interface itemType {
@@ -44,7 +42,7 @@ interface MapInfo {
 }
 
 type State = {
-  currentFloorID: string,
+  currentFloorID: number,
   licenseViewIsShow: boolean,
 }
 
@@ -63,10 +61,6 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
     this.currentMap = {name: '', path: ''}
     this.currentLayer = null
     this.layers = null
-    // this.state = {
-    //   currentFloorID: '',
-    //   isButtonsShow: true,
-    // }
   }
 
   componentDidMount() {
@@ -77,25 +71,20 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
   }
 
   componentWillUnmount() {
-    SMap.deleteGestureDetector()
+    // 移除所有手势监听
+    SMap.setGestureDetector()
   }
 
   /** 获取模块ID 由子类实现 返回一个数字类型 */
   getModueId = () => {
-    // return undefined
+    return 255
   }
   _onGetInstance = () => {
     this._addMap()
   }
   openWorkspace = async () => {
     try {
-      let wsPath = ConstPath.CustomerPath + ConstPath.RelativeFilePath.Workspace[DEFAULT_LANGUAGE], path = await FileTools.getHomeDirectory() + wsPath
-
-      let result = false
-      if (await FileTools.fileIsExist(path)) {
-        result = await SMap.openWorkspace({ server: path })
-      }
-      return result
+      return await SData.initUserWorkspace()
     } catch(e) {
       console.warn('openWorkspace error')
     }
@@ -153,7 +142,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
             type: WorkspaceType.SMWU,
           }
           // 导入地图数据
-          result = await SMap.importWorkspaceInfo(data)
+          result = await SData.importWorkspace(data)
         }
         exist = await FileTools.fileIsExist(item.path)
         if(!exist){
@@ -172,8 +161,8 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
             Toast.show("切换成功")
           }
           
-          await SMap.openTaggingDataset(DEFAULT_USER_NAME)
-          await this._getLayers(-1, async layers => {
+          await SMap._openTaggingDataset(DEFAULT_USER_NAME)
+          await this._getLayers(layers => {
             let _currentLayer = null
             // 默认设置第一个可见图层为当前图层
             for (let layer of layers) {
@@ -193,12 +182,13 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
   
           this.container?.setLoading(false)
         } else {
-          this._getLayers(-1, layers => {
-            let currentLayer = layers.length > 0 && layers[0]
+          await this._getLayers(layers => {
+            const currentLayer = layers.length > 0 && layers[0]
             if(currentLayer){
               this._setCurrentLayer(currentLayer)
             }
           })
+          
           if(isChange){
             Toast.show("切换地图失败")
           }
@@ -217,14 +207,12 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
           await this._closeMap()
         }
         // 打开数据源
-        for (let i = 0; i < item.length; i++) {
-          const element = item[i];
+        for (const element of item) {
           if(element === null) continue
           if(element.type === 'Datasource'){
             await this._openDatasource(
-              item[i],
-              item[i].layerIndex,
-              false,
+              element,
+              element.layerIndex,
             )
           }
         }
@@ -250,14 +238,14 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
    * @param {number} index 添加到地图的数据集序号
    * @param {boolean} toHead 是否添加到图层顶部
    */
-  _openDatasource = async (wsData: itemType02, index = -1, toHead = true) => {
+  _openDatasource = async (wsData: itemType02, index = -1) => {
     if (!wsData.DSParams || !wsData.DSParams.server) {
       this.container?.setLoading(false)
       Toast.show('没有找到地图')
       return
     }
     try {
-      await SMap.openDatasource(wsData.DSParams, index, toHead)
+      await SMap.openMapWithDatasource(wsData.DSParams, index)
     } catch (e) {
       this.container?.setLoading(false)
     }
@@ -271,18 +259,14 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
   _openMap = async (params: MapInfo) => {
     try {
       const absolutePath = await FileTools.appendingHomeDirectory(params.path)
-      const module = ''
       const fileName = params.name
-      const isCustomerPath = params.path.indexOf(ConstPath.CustomerPath) >= 0
-      const importResult = await SMap.openMapName(fileName, {
-        Module: module,
-        IsPrivate: !isCustomerPath,
-      })
+      // 打开地图
+      const openMapResult = await SMap.openMapName(fileName)
+      // 地图信息文件.exp
       const expFilePath = `${absolutePath.substr(
         0,
         absolutePath.lastIndexOf('.'),
       )}.exp`
-      const openMapResult = importResult && (await SMap.openMap(fileName))
       const currentMapInfo = await SMap.getMapInfo()
       if (openMapResult) {
         const expIsExist = await FileTools.fileIsExist(expFilePath)
@@ -319,33 +303,11 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
    * @param cb 回调函数
    * @returns 
    */
-  _getLayers = async (params?: number | {type: number, currentLayerIndex: number}, cb = (layers: Array<SMap.LayerInfo>) => {}):Promise<SMap.LayerInfo[] | null> => {
+  _getLayers = async (cb = (layers: Array<SMap.LayerInfo>) => {}):Promise<SMap.LayerInfo[] | null> => {
    try {
-    if (typeof params === 'number') {
-      params = {
-        type: params,
-        currentLayerIndex: -1,
-      }
-    } else {
-      params = {
-        type: params?.type !== undefined && params?.type >= 0 ? params?.type : -1,
-        currentLayerIndex: params?.currentLayerIndex || -1,
-      }
-    }
-    const layers = await SMap.getLayersByType(params.type)
-    if(layers){
-      let currentLayer
-      const currentLayerIndex = params.currentLayerIndex
-      if (currentLayerIndex >= 0 && layers.length > currentLayerIndex) {
-        currentLayer = layers[currentLayerIndex]
-      }
-      if (currentLayer) {
-       this.currentLayer = {...currentLayer}
-      }
-      this.layers = layers
-    }
+    this.layers = await SMap.getLayersInfo(-1)
     
-    cb && cb(layers)
+    cb && cb(this.layers)
     return this.layers
    } catch (error) {
     return null
@@ -439,7 +401,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
             ? scaleSize(96)
             : 0,
       },
-      backAction: event => {
+      backAction: () => {
         return this.back()
       },
       type: 'fix',
@@ -486,7 +448,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
         headerProps={this.getHeaderProps()}
       >
         <SMMapView
-          style={{flex: 1}}
+          // style={{flex: 1}}
           moduleId={this.getModueId()}
           onGetInstance={this._onGetInstance}
         />

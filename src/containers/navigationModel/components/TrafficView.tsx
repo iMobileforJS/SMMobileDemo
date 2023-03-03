@@ -13,10 +13,11 @@ import {
 } from '@/utils'
 import { color } from '@/styles'
 import { ConstNumber, ConstOnline } from '@/constants'
-import { SMap } from 'imobile_for_reactnative'
+import { SData, SMap } from 'imobile_for_reactnative'
 import { getAssets } from '@/assets'
 import { getLanguage } from '@/language'
 import { Extra } from '@/components/Container/Loading'
+import { DatasetType } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
 
 interface Props {
   device: Device,
@@ -24,7 +25,6 @@ interface Props {
   incrementRoad: () => void,
   setLoading?: (loading: boolean, info?: string, extra?: Extra) => void,
   mapLoaded: boolean,
-  currentFloorID: string,
 }
 
 interface State {
@@ -33,7 +33,6 @@ interface State {
   showIcon: boolean,
   isIndoor: boolean,
   layers: SMap.LayerInfo[],
-  currentFloorID: string,
 }
 
 export default class TrafficView extends React.Component<Props, State> {
@@ -46,28 +45,18 @@ export default class TrafficView extends React.Component<Props, State> {
       showIcon: true,
       isIndoor: false,
       layers: [],
-      currentFloorID: props.currentFloorID,
     }
-  }
-
-  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    if (nextProps.currentFloorID !== prevState.currentFloorID) {
-      if (nextProps.currentFloorID) {
-        return {
-          currentFloorID: nextProps.currentFloorID,
-          isIndoor: true,
-        }
-      } else {
-        return {
-          currentFloorID: nextProps.currentFloorID,
-          isIndoor: false,
-        }
-      }
-    }
-    return null
   }
   incrementRoad = async () => {
-    let rel = await SMap.hasLineDataset()
+    let rel = false
+    const datasources = await SData._getDatasetsByWorkspaceDatasource()
+    datasources.forEach(item => {
+      item.data.forEach(item2 => {
+        if(item2.datasetType === DatasetType.LINE){
+          rel = true
+        }
+      })
+    })
     if (rel) {
       this.props.incrementRoad()
     } else {
@@ -91,24 +80,33 @@ export default class TrafficView extends React.Component<Props, State> {
     }
   }
 
+  /**
+   * 开启/关闭交通路网
+   */
   trafficChange = async () => {
     try {
       this.props.setLoading && this.props.setLoading(true, getLanguage().Navigation.CHANGING)
       if (this.state.hasAdded) {
-        await SMap.removeTrafficMap('tencent@TrafficMap')
+        await SMap.removeLayer('tencent@TrafficMap')
       } else {
-        let layers = await this.props.getLayers()
-        if(layers){
-          let baseMap = layers.filter(layer =>
-            LayerUtils.isBaseLayer(layer),  
-          )[0]
-          if (
-            baseMap &&
-            baseMap.name !== 'baseMap' &&
-            baseMap.isVisible
-          ) {
-            await SMap.openTrafficMap(ConstOnline.TrafficMap.DSParams)
+        const layers = await SMap.getLayersInfo()
+        let baseMap = layers.filter(layer =>
+          LayerUtils.isBaseLayer(layer),
+        )[0]
+        if (
+          baseMap &&
+          baseMap.name !== 'baseMap' &&
+          baseMap.isVisible
+        ) {
+          if(!await SData.isDatasourceOpened(ConstOnline.TrafficMap.DSParams.alias)) {
+            await SData.openDatasource(ConstOnline.TrafficMap.DSParams)
           }
+          const scale = await SMap.getMapScale()
+          const center = await SMap.getMapCenter()
+          await SMap.addLayer({datasource: ConstOnline.TrafficMap.DSParams.alias, dataset: 0})
+          await SMap.setMapScale(1 / parseFloat(scale))
+          await SMap.setMapCenter(center.x, center.y)
+          SMap.refreshMap()
         }
       }
       let hasAdded = !this.state.hasAdded

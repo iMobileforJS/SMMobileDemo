@@ -204,11 +204,10 @@ _openMap = async (params: MapInfo)
 ```ts
 /**
  * 获取图层列表
- * @param {number | {type: number, currentLayerIndex: number}} params  图层参数
  * @param cb 回调函数
  * @returns 
  */
-_getLayers = async (params?: number | {type: number, currentLayerIndex: number}, cb = (layers: Array<SMap.LayerInfo>) => {}):Promise<SMap.LayerInfo[] | null> 
+_getLayers = async (cb = (layers: Array<SMap.LayerInfo>) => {}):Promise<SMap.LayerInfo[] | null> 
 ```
 8. _setCurrentLayer： 设为当前图层
 ```ts

@@ -13,20 +13,19 @@
  import { scaleSize } from "@/utils";
  import { Props as HeaderProps } from "@/components/Header/Header";
  import { SMap } from 'imobile_for_reactnative';
- import { Text, View } from 'react-native';
+ import { View } from 'react-native';
  import { MapViewProps } from '../mapView/types';
  import { ImageButton } from '@/components'
  import { getAssets } from '@/assets'
  import styles from './styles'
  import { openHunanMap, openChenduMap, openTiandituMap, openBingMap, fullScreen } from './mapBrowsingAction'
-import { DEFAULT_DATA_MAP_FILE } from './config';
  
  type Props = {
   //  getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
  }
  
  type State = {
-   currentFloorID: string,
+   currentFloorID: number,
    licenseViewIsShow: boolean,
    isFull: boolean,
  }
@@ -36,7 +35,7 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
    constructor(props: MapViewProps & Props) {
      super(props)
      this.state = {
-      currentFloorID: '',
+      currentFloorID: 0,
       licenseViewIsShow: false,
       isFull: true,
      }
@@ -77,7 +76,7 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
    }
  
    backAction = async () => {
-     await SMap.deleteGestureDetector()
+     await SMap.setGestureDetector()
    }
  
    componentDidMount(): void {
@@ -89,7 +88,7 @@ import { DEFAULT_DATA_MAP_FILE } from './config';
    }
  
    componentWillUnmount() {
-     SMap.deleteGestureDetector()
+     SMap.setGestureDetector()
    }
 
 

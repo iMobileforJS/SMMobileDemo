@@ -20,7 +20,7 @@ interface Props {
   style?: ViewStyle,
   compassStyle?: any,
   device: any,
-  currentFloorID: string,
+  currentFloorID: number,
   bottomHeight?: any,
   selectLocation?: any,
   selectZoomIn?: any,
@@ -207,8 +207,6 @@ export default class MapController extends React.Component<Props, State> {
       !result &&
         Toast.show('不在地图范围内')
     })
-
-    let map = await SMap.getCurrentPosition()
   }
 
   renderLocation = () => {

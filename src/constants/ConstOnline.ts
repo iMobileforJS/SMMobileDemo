@@ -1,4 +1,4 @@
-import { TEngineType } from "imobile_for_reactnative"
+import { TEngineType } from "imobile_for_reactnative/NativeModule/interfaces/data/SData"
 
 interface DatasrouceParams {
   server: string,

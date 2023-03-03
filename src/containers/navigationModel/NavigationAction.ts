@@ -12,7 +12,7 @@
  */
 import { TouchMode } from "@/constants"
 import { LicenseUtil, Toast, TouchAction } from "@/utils"
-import { CustomTools, SMap } from "imobile_for_reactnative"
+import { /** 用户自定义事件类 CustomTools */ SIndoorNavigation, SMap, SNavigation } from "imobile_for_reactnative"
 import NavigationView from './NavigationView'
 
 
@@ -22,7 +22,7 @@ import NavigationView from './NavigationView'
  */
 async function stopGuide(): Promise<void>{
   try {
-    await SMap.stopGuide()
+    await SNavigation.stopGuide()
   } catch (error) {
     console.warn('停止导航出错')
   }
@@ -35,9 +35,11 @@ async function stopGuide(): Promise<void>{
  */
 async function clear(that: NavigationView): Promise<void> {
   try {
-    await SMap.removeAllCallout()
-    await SMap.removePOICallout()
-    await SMap.clearPoint()
+    SNavigation.clearPath()
+    SIndoorNavigation.clearPath()
+    SMap.clearTrackingLayer()
+    SMap.removeCallout('startPoint')
+    SMap.removeCallout('endPoint')
     that.showFullMap(false)
     TouchAction.setTouchMode(TouchMode.NORMAL)
     TouchAction.clearTouchPoints() // 清除起点/终点
@@ -71,7 +73,7 @@ async function actual(that: NavigationView):Promise<void> {
     TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_BEGIN)
     that.mapSelectButton?.setVisible(false)
     // 开启导航
-    await SMap.outdoorNavigation(0)
+    await SNavigation.startGuide(0)
 
   } catch (error) {
     console.warn("真实导航出错: " + JSON.stringify(error))
@@ -102,7 +104,7 @@ async function simulate(that: NavigationView):Promise<void> {
     TouchAction.setTouchMode(TouchMode.NAVIGATION_TOUCH_BEGIN)
     that.mapSelectButton?.setVisible(false)
     // 开启导航
-    await SMap.outdoorNavigation(1)
+    await SNavigation.startGuide(1)
   } catch (error) {
     console.warn("模拟导航出错: " + JSON.stringify(error))
   }
@@ -120,24 +122,24 @@ async function clearCallout(that: NavigationView):Promise<void> {
     await clear(that)
     that.mapSelectButton?.setVisible(false)
     Toast.show('长按选择起点')
-    await CustomTools.clearMapCallout('')
+    // await CustomTools.clearMapCallout('')
   } catch (error) {
     Toast.show('清理失败')
   }
 }
 
 /**
- * 中心点
+ * 用户自定义方法CustomTools, 添加中心点
  * @returns
  */
 async function centerPoint(): Promise<void> {
   try {
     const point = await SMap.getMapCenter()
     console.warn(point)
-    const result = CustomTools.addMapCallout(point.x, point.y, '')
-    if(!result) {
-      Toast.show('获取中心点失败')
-    }
+    // const result = CustomTools.addMapCallout(point.x, point.y, '')
+    // if(!result) {
+    //   Toast.show('获取中心点失败')
+    // }
   } catch (error) {
     Toast.show('获取中心点异常')
   }

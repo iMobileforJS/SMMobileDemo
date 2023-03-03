@@ -9,12 +9,12 @@
  */
 import React from 'react'
 import MapView from "../mapView/MapView";
-import { scaleSize, TouchAction, Toast, LicenseUtil } from "@/utils";
+import { scaleSize, TouchAction, Toast } from "@/utils";
 import { Props as HeaderProps } from "@/components/Header/Header";
 import { TrafficView, MapSelectButton } from './components';
 import { ConstPath, DEFAULT_USER_NAME, TouchMode } from '@/constants';
-import { SMap, CustomTools, FileTools, WorkspaceType } from 'imobile_for_reactnative';
-import { EmitterSubscription, View } from 'react-native';
+import { SMap, FileTools, SNavigation } from 'imobile_for_reactnative';
+import {  View } from 'react-native';
 import { MapViewProps } from '../mapView/types';
 import { getLanguage } from '@/language';
 import { ImageButton } from '@/components'
@@ -22,13 +22,13 @@ import { getAssets } from '@/assets'
 import styles from './styles'
 import { DEFAULT_DATA, DEFAULT_DATA_MAP, DEFAULT_DATA_WORKSPACE } from './config';
 import NavigationAction from './NavigationAction';
+import { Point2D } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData';
 
 type Props = {
-  // getLayers: (params?: number | {type: number, currentLayerIndex: number}) => Promise<SMap.LayerInfo[]>,
 }
 
 type State = {
-  currentFloorID: string,
+  currentFloorID: number,
   licenseViewIsShow: boolean,
   isFull: boolean,
 }
@@ -36,14 +36,14 @@ type State = {
 export default class NavigationView extends MapView<Props, State> {
 
   trafficView: TrafficView | undefined | null
-  floorHiddenListener: EmitterSubscription | undefined | null
   mapSelectButton: MapSelectButton | undefined | null
-  currentFloorID = ''
+  currentFloorID: number = 0
+  navigationResult: boolean = false
 
   constructor(props: MapViewProps & Props) {
     super(props)
     this.state = {
-      currentFloorID: '',
+      currentFloorID: 0,
       licenseViewIsShow: false,
       isFull: true,
     }
@@ -63,10 +63,6 @@ export default class NavigationView extends MapView<Props, State> {
             : 0,
       },
       backAction: () => {
-        // this.backPositon = {
-        //   x: event.nativeEvent.pageX,
-        //   y: event.nativeEvent.pageY,
-        // }
         return this.back()
       },
       type: 'fix',
@@ -84,19 +80,17 @@ export default class NavigationView extends MapView<Props, State> {
 
   /**
    * 设置楼层id
-   * @param {string} currentFloorID 楼层id
+   * @param {number} currentFloorID 楼层id
    * @param {*} cb 完成回调
    */
-  changeFloorID = (currentFloorID: string, cb?: () => void) => {
+  changeFloorID = (currentFloorID: number, cb?: () => void) => {
     if (currentFloorID !== this.state.currentFloorID) {
-      this.setState(
-        {
-          currentFloorID,
-        },
-        () => {
-          cb && cb()
-        },
-      )
+      this.setState({
+        currentFloorID,
+      },
+      () => {
+        cb && cb()
+      })
     }
   }
 
@@ -110,26 +104,27 @@ export default class NavigationView extends MapView<Props, State> {
   }
 
   backAction = async () => {
-    await SMap.deleteGestureDetector()
-    await SMap.removeAllCallout()
+    await SMap.setGestureDetector()
+    await SMap.removeAllCallouts()
   }
 
   componentDidMount(): void {
     try {
       this.setGestureDetectorListener()
       SMap.setIsMagnifierEnabled(true)
-      this.addFloorHiddenListener()
-      SMap.setIndustryNavigationListener({
-        callback: async () => {},
-      })
-      SMap.setStopNavigationListener({
-        callback: () => {
+      // this.addFloorHiddenListener()
+      
+      // 二维地图导航监听
+      SNavigation.setNaviListener({
+        /** 导航开始回调 */
+        onStartNavi: () => {
+        },
+        /** 导航结束回调 */
+        onStopNavi:() => {
           NavigationAction.clear(this)
         },
-      })
-      SMap.setCurrentFloorIDListener({
-        callback: currentFloorID => {
-          this.changeFloorID(currentFloorID)
+        /** 导航抵达终点回调 */
+        onArrivedDestination:() => {
         },
       })
       Toast.show('长按选择起点')
@@ -139,29 +134,19 @@ export default class NavigationView extends MapView<Props, State> {
   }
 
   componentWillUnmount() {
-    SMap.deleteGestureDetector()
+    SMap.setGestureDetector()
     NavigationAction.stopGuide()
     NavigationAction.clear(this)
   }
 
   addMap = async () => {
     try {
-
-      // 初始化导航采集数据
-      // await this.initData(DEFAULT_DATA)
-
       const home = await FileTools.appendingHomeDirectory()
 
       const path = `${home + ConstPath.ExternalData}/${DEFAULT_DATA}/${DEFAULT_DATA_WORKSPACE}.smwu`
       const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map + DEFAULT_DATA_MAP}.xml`
       this.changeMap(true, false, {name: DEFAULT_DATA_MAP,path: mapPath}, path)
 
-
-      // SMap.getCurrentFloorID().then(currentFloorID => {
-      //   this.changeFloorID(currentFloorID)
-      // })
-      // 初始化导航语音
-      SMap.initSpeakPlugin()
     } catch (error) {
       
     }
@@ -171,11 +156,26 @@ export default class NavigationView extends MapView<Props, State> {
     return 0x20
   }
 
-  magntouchCallback = async (event: { LLPoint: Point }) => {
+  /** 长按地图(含放大镜)选点事件回调 */
+  magntouchCallback = async (event: {
+    mapPoint: Point2D;
+    screenPoint: Point2D;
+    LLPoint: Point2D;
+}) => {
     switch (TouchAction.getTouchMode()) {
       case TouchMode.NORMAL:
       case TouchMode.MAP_SELECT_START_POINT:
-        await SMap.getStartPoint(event.LLPoint.x, event.LLPoint.y, false)
+        SMap.removeCallout('startPoint')
+        // 使用地图坐标设置起点callout
+        await SMap.addCallout('startPoint', {
+          x: event.mapPoint.x,
+          y: event.mapPoint.y,
+        }, {
+          type: 'image',
+          /** 内置的图片资源路径 */
+          resource: 'start_point',
+        })
+        // 保存起点经纬度,用于导航
         TouchAction.setTouchStartPoint({
           x: event.LLPoint.x,
           y: event.LLPoint.y,
@@ -188,10 +188,20 @@ export default class NavigationView extends MapView<Props, State> {
         this.showFullMap(true)
         break
       case TouchMode.MAP_SELECT_END_POINT:
-        await SMap.getEndPoint(event.LLPoint.x, event.LLPoint.y, false)
+        SMap.removeCallout('endPoint')
+        // 使用地图坐标设置终点callout
+        await SMap.addCallout('endPoint', {
+          x: event.mapPoint.x,
+          y: event.mapPoint.y,
+        }, {
+          type: 'image',
+          /** 内置的图片资源路径 */
+          resource: 'destination_point',
+        })
         this.mapSelectButton?.setVisible(true, {
           button: getLanguage().Navigation.SET_AS_DESTINATION,
         })
+        // 保存终点经纬度,用于导航
         TouchAction.setTouchEndPoint({
           x: event.LLPoint.x,
           y: event.LLPoint.y,
@@ -200,6 +210,7 @@ export default class NavigationView extends MapView<Props, State> {
     }
   }
 
+  /** 判断是否可以路径分析 */
   navigateAble = () => {
     const startPoint = TouchAction.getTouchStartPoint()
     const endPoint = TouchAction.getTouchEndPoint()
@@ -211,30 +222,67 @@ export default class NavigationView extends MapView<Props, State> {
       Toast.show('请选择终点')
       return false
     }
-    if (!this.mapSelectButton?.navigationResult) {
+    if (!this.navigationResult) {
       Toast.show('请分析路线')
       return false
     }
     return true
   }
-  
-  /** 添加楼层显隐监听 */
-  addFloorHiddenListener = () => {
-    this.floorHiddenListener = SMap.addFloorHiddenListener(async result => {
-      //在选点过程中/路径分析界面 不允许拖放改变FloorList、MapController的状态
-      // 使用this.currentFloorID 使ID发生变化时只渲染一次
-      if (result.currentFloorID !== this.currentFloorID) {
-        this.currentFloorID = result.currentFloorID
-        let guideInfo = await SMap.isGuiding()
-        if (!guideInfo.isOutdoorGuiding) {
-          this.setState({
-            currentFloorID: result.currentFloorID,
-          })
-        } else {
-          this.currentFloorID = this.state.currentFloorID
-        }
+
+  /** 路径分析 */
+  analyst = async () => {
+    try {
+      const startPoint = TouchAction.getTouchStartPoint()
+      const endPoint = TouchAction.getTouchEndPoint()
+      if (!startPoint || !endPoint) return
+      this.setLoading(true)
+
+      const datasourceName = 'beijing02'
+      const datasetName = 'RoadNetwork'
+      const modelName = 'netModel_3'
+
+      const homePath = await FileTools.getHomeDirectory()
+      const modelPath = `${homePath}/SMMobileDemo/User/Customer/Data/Datasource/${modelName}.snm`
+
+      // 1. 设置室外导航数据和模型数据
+      await SNavigation.setRouteAnalyzeData({
+        networkDataset: {
+          datasourceAlias: datasourceName,
+          datasetName:  datasetName
+        },
+        modelPath: modelPath
+      })
+      // 2. 设置室外导航起始点
+      await SNavigation.setRouteAnalyzePoints({
+        startPoint: {x: startPoint.x, y: startPoint.y},
+        destinationPoint: {x: endPoint.x, y: endPoint.y}
+      })
+      // 3. 室外路线分析
+      const rel = await SNavigation.routeAnalyst()
+      this.setLoading(false)
+      if (!rel) {
+        this.setLoading(false)
+        Toast.show(
+          getLanguage().Navigation.PATH_ANALYSIS_FAILED,
+        )
+        return
       }
-    })
+      // 路径分析成功标识,之后可以进行模拟/真实导航
+      this.navigationResult = true
+    } catch (e) {
+      this.setLoading(false)
+      Toast.show(
+        getLanguage().Navigation.PATH_ANALYSIS_FAILED,
+      )
+      // 清除室内外数据
+      SNavigation.clearPath()
+      // 清除起始点标记
+      SMap.removeCallout('startPoint')
+      SMap.removeCallout('endPoint')
+    }
+    // 分析结束,重置TouchMode,使可点击屏幕开启/退出全屏模式
+    TouchAction.setTouchMode(TouchMode.NORMAL)
+    this.mapSelectButton?.setVisible(false)
   }
 
   showFullMapAction = (full: boolean) => {
@@ -261,7 +309,6 @@ export default class NavigationView extends MapView<Props, State> {
     return (
       <TrafficView
         ref={ref => (this.trafficView = ref)}
-        currentFloorID={this.state.currentFloorID}
         getLayers={this._getLayers}
         device={this.props.device}
         incrementRoad={() => {
@@ -278,8 +325,7 @@ export default class NavigationView extends MapView<Props, State> {
     return (
       <MapSelectButton
         ref={ref => (this.mapSelectButton = ref)}
-        setLoading={this.setLoading}
-        floorID={this.state.currentFloorID}
+        analyst={this.analyst}
       />
     )
   }
@@ -308,13 +354,13 @@ export default class NavigationView extends MapView<Props, State> {
             await NavigationAction.clearCallout(this)
           }}
         />
-        <ImageButton
+        {/* <ImageButton
           image={getAssets().mapTools.icon_location}
           title={'中心点'}
           onPress={async () => {
             await NavigationAction.centerPoint()
           }}
-        />
+        /> */}
       </View>
     )
   }

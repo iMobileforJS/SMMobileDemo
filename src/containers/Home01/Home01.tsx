@@ -1,11 +1,10 @@
 /**
  * 二级根页面
  */
-import navigation from "@/assets/navigation";
 import License from "@/components/License";
-import { LicenseUtil, scaleSize, screen, Toast } from "@/utils";
+import { LicenseUtil, screen } from "@/utils";
 import React, { Component } from "react";
-import { View, Button, Text } from "react-native";
+import { View, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import styles from './styles'
 
@@ -22,12 +21,6 @@ class Home01 extends Component<Props, State> {
     super(props)
     this.state = {
       licenseViewIsShow: false,
-    }
-  }
-
-  async componentDidMount() {
-    if (await LicenseUtil.loginCloudLicense('13684098564', '12345678')) {
-      Toast.show('激活成功')
     }
   }
 
