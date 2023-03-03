@@ -78,7 +78,7 @@ export default class MapSelectButton extends React.Component<Props, State> {
           this.setState({
             show: false,
           })
-          Toast.show('长按选择终点')
+          Toast.show(getLanguage().Navigation.LONG_PRESS_ADD_END)
         }
       } else {
         let endPoint = TouchAction.getTouchEndPoint()
@@ -89,7 +89,7 @@ export default class MapSelectButton extends React.Component<Props, State> {
             button: getLanguage().Navigation.ROUTE_ANALYST,
           })
         } else {
-          Toast.show(getLanguage().Navigation.TOUCH_TO_ADD_END)
+          Toast.show(getLanguage().Navigation.LONG_PRESS_ADD_END)
         }
       }
     } catch (error) {

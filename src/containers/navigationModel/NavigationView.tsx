@@ -78,22 +78,6 @@ export default class NavigationView extends MapView<Props, State> {
     }
   }
 
-  /**
-   * 设置楼层id
-   * @param {number} currentFloorID 楼层id
-   * @param {*} cb 完成回调
-   */
-  changeFloorID = (currentFloorID: number, cb?: () => void) => {
-    if (currentFloorID !== this.state.currentFloorID) {
-      this.setState({
-        currentFloorID,
-      },
-      () => {
-        cb && cb()
-      })
-    }
-  }
-
   setGestureDetectorListener = async () => {
     await SMap.setGestureDetector({
       singleTapHandler: this.touchCallback,
@@ -127,7 +111,6 @@ export default class NavigationView extends MapView<Props, State> {
         onArrivedDestination:() => {
         },
       })
-      Toast.show('长按选择起点')
     } catch (error) {
       
     }
@@ -139,13 +122,31 @@ export default class NavigationView extends MapView<Props, State> {
     NavigationAction.clear(this)
   }
 
+  /** 添加地图,初始化数据 */
   addMap = async () => {
     try {
       const home = await FileTools.appendingHomeDirectory()
 
       const path = `${home + ConstPath.ExternalData}/${DEFAULT_DATA}/${DEFAULT_DATA_WORKSPACE}.smwu`
       const mapPath = `${home + ConstPath.UserPath + DEFAULT_USER_NAME}/${ConstPath.RelativeFilePath.Map + DEFAULT_DATA_MAP}.xml`
-      this.changeMap(true, false, {name: DEFAULT_DATA_MAP,path: mapPath}, path)
+      await this.changeMap(true, false, {name: DEFAULT_DATA_MAP,path: mapPath}, path)
+
+      const datasourceName = 'beijing02'
+      const datasetName = 'RoadNetwork'
+      const modelName = 'netModel_3'
+
+      const homePath = await FileTools.getHomeDirectory()
+      const modelPath = `${homePath}/SMMobileDemo/User/Customer/Data/Datasource/${modelName}.snm`
+
+      // 1. 设置室外导航数据和模型数据
+      await SNavigation.setRouteAnalyzeData({
+        networkDataset: {
+          datasourceAlias: datasourceName,
+          datasetName:  datasetName
+        },
+        modelPath: modelPath
+      })
+      Toast.show(getLanguage().Navigation.LONG_PRESS_ADD_START)
 
     } catch (error) {
       
@@ -236,22 +237,6 @@ export default class NavigationView extends MapView<Props, State> {
       const endPoint = TouchAction.getTouchEndPoint()
       if (!startPoint || !endPoint) return
       this.setLoading(true)
-
-      const datasourceName = 'beijing02'
-      const datasetName = 'RoadNetwork'
-      const modelName = 'netModel_3'
-
-      const homePath = await FileTools.getHomeDirectory()
-      const modelPath = `${homePath}/SMMobileDemo/User/Customer/Data/Datasource/${modelName}.snm`
-
-      // 1. 设置室外导航数据和模型数据
-      await SNavigation.setRouteAnalyzeData({
-        networkDataset: {
-          datasourceAlias: datasourceName,
-          datasetName:  datasetName
-        },
-        modelPath: modelPath
-      })
       // 2. 设置室外导航起始点
       await SNavigation.setRouteAnalyzePoints({
         startPoint: {x: startPoint.x, y: startPoint.y},
