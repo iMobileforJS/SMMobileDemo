@@ -250,7 +250,6 @@ export default class NavigationView extends MapView<Props, State> {
         Toast.show(
           getLanguage().Navigation.PATH_ANALYSIS_FAILED,
         )
-        return
       }
       // 路径分析成功标识,之后可以进行模拟/真实导航
       this.navigationResult = true
