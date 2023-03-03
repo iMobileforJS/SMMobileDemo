@@ -267,6 +267,7 @@ export default class NavigationView extends MapView<Props, State> {
     // 分析结束,重置TouchMode,使可点击屏幕开启/退出全屏模式
     TouchAction.setTouchMode(TouchMode.NORMAL)
     this.mapSelectButton?.setVisible(false)
+    this.showFullMap(false)
   }
 
   showFullMapAction = (full: boolean) => {

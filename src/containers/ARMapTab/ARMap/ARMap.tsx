@@ -1,7 +1,7 @@
-import { Button, Container, SlideBar } from '@/components'
+import { Button, Container, Dialog, SlideBar } from '@/components'
 import { FileTools, SARMap, SData, SMARMapView, SScene, SAIDetectView } from 'imobile_for_reactnative'
 import React from 'react'
-import { Image, Platform, View } from 'react-native'
+import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
 import { Props as HeaderProps } from '@/components/Header/Header'
 import { scaleSize, screen, Toast } from '@/utils'
@@ -15,6 +15,31 @@ import wangge from './wangge.json'
 import { DatasetType, EngineType, Vector3 } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
 import { ARAction, IARTransform } from 'imobile_for_reactnative/NativeModule/interfaces/ar/SARMap'
 
+const styles = StyleSheet.create({
+  positionDialog: {
+    flexDirection: 'column',
+  },
+  positionRow: {
+    flexDirection: 'row',
+    height: scaleSize(100),
+    alignItems: 'center',
+    paddingHorizontal: scaleSize(15),
+  },
+  rowTitle: {
+    width: scaleSize(80),
+    fontSize: scaleSize(30),
+    textAlign: 'center',
+  },
+  rowInput: {
+    flex: 1,
+    height: scaleSize(80),
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: scaleSize(8),
+  },
+})
+
 interface Props {
 	navigation: any,
 	device: Device,
@@ -22,7 +47,9 @@ interface Props {
 
 interface State {
   isAvailable: boolean,
-  isInit: boolean,
+  isCalibrate: boolean, // 是否校准
+  isOpenMap: boolean, // 是否打开地图
+  isInit: boolean, // 是否初始化
 	name3D: string,
 	layerName: string,
   type: '' | 'rotation',
@@ -32,19 +59,21 @@ interface State {
 
 const AR_DATASOURCE = 'ARDatasource'
 const AR_DATASET = 'ARDataset'
-const AR_DATASOURCE_1 = 'ARDatasource_1'
-const AR_DATASET_1 = 'ARDataset_1'
 const USERNAME = 'Customer'
+const DEMO_NAME = '地砖模型03'
 
 export default class ARMap extends React.Component<Props, State> {
   container: ContainerType | undefined | null
-
   visible: boolean = true
+  position = { x: 0, y: 0, z: 0}
+  positionDialog: Dialog | undefined | null
 
   constructor(props: Props) {
 		super(props)
 		this.state = {
       isAvailable: false,
+      isCalibrate: false,
+      isOpenMap: false,
       isInit: false,
 			name3D: '',
 			layerName: '',
@@ -71,7 +100,7 @@ export default class ARMap extends React.Component<Props, State> {
       return false
     }
     // 设置位置校准
-    SARMap.setPosition(0, 0, 0)
+    // SARMap.setPosition(0, 0, 0)
 
      // }
     await SARMap.addAttributeListener({
@@ -117,11 +146,11 @@ export default class ARMap extends React.Component<Props, State> {
   }
 
   /**
-   * 创建AR地图
+   * 初始化AR地图数据
    * @param path
    * @returns
    */
-  createARMap = async (datasourcePath: string, datasourceName: string, datasetName: string) => {
+  initARData = async (datasourcePath: string, datasourceName: string, datasetName: string) => {
 		try {
 			let server = datasourcePath + datasourceName + '.udb'
 			const exist = await FileTools.fileIsExist(server)
@@ -279,10 +308,11 @@ export default class ARMap extends React.Component<Props, State> {
 			// const path3d = homePath + ConstPath.ExternalData + '/ChengDuSuperMap/ChengDuSuperMap.sxwu'
 			// const userPath3d = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativeFilePath.Scene + 'ChengDuSuperMap/ChengDuSuperMap.sxwu'
 			const path3d = `${homePath + ConstPath.ExternalData}/${name}/${name}.sxwu`
-			const userPath3d = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${name}/${name}.sxwu`
+			const userPath3d = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}${name}/${name}.sxwu`
+      console.warn(userPath3d)
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				const data = {server: path3d}
-				await SScene.import3DWorkspace(data)
+				const result = await SScene.import3DWorkspace(data)
 			}
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				Toast.show('三维数据不存在')
@@ -291,7 +321,6 @@ export default class ARMap extends React.Component<Props, State> {
 			// 添加三维图层
 			const addLayerName = await SARMap.addSceneLayer(datasourceName, datasetName, userPath3d)
 			if(addLayerName !== ''){
-				Toast.show('添加三维图层成功: ' + addLayerName)
 				this.setState({
           name3D: name,
 					layerName: addLayerName,
@@ -362,22 +391,26 @@ export default class ARMap extends React.Component<Props, State> {
    */
   renderButtons = () => {
     return (
-      <View
+      <ScrollView
         style={{
           position: 'absolute',
           right: 10,
           top: 60 + screen.getIphonePaddingTop(),
+          bottom: 0,
           backgroundColor: 'transparent',
         }}
       >
+        {this.renderButton('校准', async() => {
+          this.positionDialog?.setDialogVisible(true)
+        })}
 				{this.renderButton('初始化地图', async() => {
 					const homePath = await FileTools.getHomeDirectory()
 					const datasourcePath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.ARDatasource
 					const datasourceName = AR_DATASOURCE
 					const datasetName = AR_DATASET
-					const createResult = await this.createARMap(datasourcePath, datasourceName, datasetName)
+					const createResult = await this.initARData(datasourcePath, datasourceName, datasetName)
 
-					// await this.createARMap(datasourcePath, datasourceName + 1, datasetName + 1)
+					// await this.init(datasourcePath, datasourceName + 1, datasetName + 1)
           if (createResult.success) {
             this.setState({
               isInit: true,
@@ -388,6 +421,43 @@ export default class ARMap extends React.Component<Props, State> {
             Toast.show('初始化地图失败')
           }
 				})}
+        {this.renderButton('打开地图', async() => {
+          if (!this.state.isCalibrate) {
+            Toast.show('请先校准')
+            return
+          }
+          const homePath = await FileTools.getHomeDirectory()
+          // 得到的是工作空间所在目录 需要去找到sxwu文件路径
+          try {
+            const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap}${DEMO_NAME}/${DEMO_NAME}.arxml`
+            if (await FileTools.fileIsExist(arMapPath)) {
+              await SARMap.open(arMapPath)
+              const layers = await SARMap.getLayers()
+              this.setState({
+                isOpenMap: true,
+                layerName: layers[0]?.name || '',
+              })
+            } else {
+              Toast.show('打开地图失败,请检查数据是否存在')
+            }
+          } catch(e) {
+            Toast.show('打开地图失败,请检查数据是否存在')
+          }
+        })}
+        {this.renderButton('关闭地图', async() => {
+          if (!this.state.isOpenMap && !this.state.layerName) {
+            Toast.show('请先打开地图')
+            return
+          }
+          try {
+            await SARMap.close()
+            this.setState({
+              isOpenMap: false,
+            })
+          } catch(e) {
+            
+          }
+        })}
         {/* {this.renderButton('添加大厦', async() => {
           if (!this.state.isInit) {
             Toast.show('请先初始化地图')
@@ -402,7 +472,11 @@ export default class ARMap extends React.Component<Props, State> {
             Toast.show('请先初始化地图')
             return
           }
-          await this.add3D(AR_DATASOURCE, AR_DATASET, '地砖模型03')
+          if (!this.state.isCalibrate) {
+            Toast.show('请先校准')
+            return
+          }
+          await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
         })}
         {/* {this.renderButton('添加Online', async() => {
           if (!this.state.isInit) {
@@ -502,7 +576,7 @@ export default class ARMap extends React.Component<Props, State> {
             position: _position,
           })
         })}
-      </View>
+      </ScrollView>
     )
   }
 
@@ -585,6 +659,65 @@ export default class ARMap extends React.Component<Props, State> {
     )
   }
 
+
+  _renderPositionDialog = () => {
+    return (
+      <Dialog
+        ref={ref => this.positionDialog = ref}
+        confirmAction={async () => {
+          // 位置校准
+          await SARMap.calibrate(this.position.x, this.position.y, this.position.z)
+          this.positionDialog?.setDialogVisible(false)
+          this.setState({
+            isCalibrate: true,
+          })
+        }}
+        cancelAction={() => {
+          this.positionDialog?.setDialogVisible(false)
+        }}
+      >
+        <View style={styles.positionDialog}>
+          <View style={styles.positionRow}>
+            <Text style={styles.rowTitle}>x</Text>
+            <TextInput
+              style={styles.rowInput}
+              defaultValue={this.position.x + ''}
+              onChangeText={(text: string) => {
+                if (isNaN(parseFloat(text))) return
+                this.position.x = parseFloat(text)
+              }}
+              keyboardType={'numeric'}
+            />
+          </View>
+          <View style={styles.positionRow}>
+            <Text style={styles.rowTitle}>y</Text>
+            <TextInput
+              style={styles.rowInput}
+              defaultValue={this.position.y + ''}
+              onChangeText={(text: string) => {
+                if (isNaN(parseFloat(text))) return
+                this.position.y = parseFloat(text)
+              }}
+              keyboardType={'numeric'}
+            />
+          </View>
+          <View style={styles.positionRow}>
+            <Text style={styles.rowTitle}>z</Text>
+            <TextInput
+              style={styles.rowInput}
+              defaultValue={this.position.z + ''}
+              onChangeText={(text: string) => {
+                if (isNaN(parseFloat(text))) return
+                this.position.z = parseFloat(text)
+              }}
+              keyboardType={'numeric'}
+            />
+          </View>
+        </View>
+      </Dialog>
+    )
+  }
+
   render() {
     return (
       <Container
@@ -600,6 +733,7 @@ export default class ARMap extends React.Component<Props, State> {
         {this.renderButtons()}
         {this.renderARAttribute()}
         {this.state.type === 'rotation' && this.renderSliderBar()}
+        {this._renderPositionDialog()}
       </Container>
     )
   }
