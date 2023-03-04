@@ -6,6 +6,7 @@ import SearchBar from "./SearchBar"
 import HardwareBackHandler from "./HardwareBackHandler"
 import {
   Dialog,
+  SimpleDialog,
 } from "./Dialog"
 import Button from "./Button"
 import SlideBar from "./SlideBar"
@@ -18,6 +19,7 @@ export {
   SearchBar,
   HardwareBackHandler,
   Dialog,
+  SimpleDialog,
   Button,
   SlideBar,
 }

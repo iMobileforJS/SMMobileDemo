@@ -4,7 +4,7 @@ import React from 'react'
 import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
 import { Props as HeaderProps } from '@/components/Header/Header'
-import { scaleSize, screen, Toast } from '@/utils'
+import { DialogUtil, scaleSize, screen, Toast } from '@/utils'
 import { ConstPath } from '@/constants'
 import { color } from '@/styles'
 import { getAssets } from '@/assets'
@@ -47,14 +47,12 @@ interface Props {
 
 interface State {
   isAvailable: boolean,
-  isCalibrate: boolean, // 是否校准
-  isOpenMap: boolean, // 是否打开地图
-  isInit: boolean, // 是否初始化
 	name3D: string,
 	layerName: string,
   type: '' | 'rotation',
   attribute: Array<ARAttributeType>,
   position: Vector3,
+  calibratePostion: Vector3,
 }
 
 const AR_DATASOURCE = 'ARDatasource'
@@ -67,19 +65,20 @@ export default class ARMap extends React.Component<Props, State> {
   visible: boolean = true
   position = { x: 0, y: 0, z: 0}
   positionDialog: Dialog | undefined | null
+  isInit = false // 是否初始化
+  isCalibrate = false // 是否校准
+  isOpenMap = false // 是否打开地图
 
   constructor(props: Props) {
 		super(props)
 		this.state = {
       isAvailable: false,
-      isCalibrate: false,
-      isOpenMap: false,
-      isInit: false,
 			name3D: '',
 			layerName: '',
       type: '',
       attribute: [],
       position: {x: 0, y: 0, z: 0},
+      calibratePostion: {x: 0, y: 0, z: 0},
 		}
 	}
 
@@ -99,10 +98,7 @@ export default class ARMap extends React.Component<Props, State> {
       Toast.show('该设备不支持AR')
       return false
     }
-    // 设置位置校准
-    // SARMap.setPosition(0, 0, 0)
-
-     // }
+    // 设置点击对象显示属性监听
     await SARMap.addAttributeListener({
       callback: async (result: any) => {
         try {
@@ -163,6 +159,7 @@ export default class ARMap extends React.Component<Props, State> {
 					server: server,
 					engineType: EngineType.UDB,
 				})
+        result = true
 			} else {
 				//存在，检查是否打开
 				const wsds = await SData.getDatasources()
@@ -189,14 +186,9 @@ export default class ARMap extends React.Component<Props, State> {
 				//没有则创建
 				if(defualtDset.length === 0) {
 					result = await SData.createDataset(datasourceName, datasetName, DatasetType.PointZ)
-				} else {
-					// //重名则创建新的数据集
-					// if(newDataset) {
-					// 	datasetName = await SMap.getAvailableDatasetName(datasourceName, datasetName)
-					// 	result = await SMap.createDataset(datasourceName, datasetName, datastType)
-					// }
 				}
 				if(result) {
+          this.isInit = true
 					return {
 						success: true,
 						datasourceName,
@@ -302,14 +294,15 @@ export default class ARMap extends React.Component<Props, State> {
 
 	/** 添加三维图层 */
   add3D = async (datasourceName: string, datasetName: string, name: string) => {
+    if (!this.isInit) {
+      Toast.show('请先初始化地图')
+      return
+    }
 		const homePath = await FileTools.getHomeDirectory()
 		// 得到的是工作空间所在目录 需要去找到sxwu文件路径
 		try {
-			// const path3d = homePath + ConstPath.ExternalData + '/ChengDuSuperMap/ChengDuSuperMap.sxwu'
-			// const userPath3d = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativeFilePath.Scene + 'ChengDuSuperMap/ChengDuSuperMap.sxwu'
 			const path3d = `${homePath + ConstPath.ExternalData}/${name}/${name}.sxwu`
 			const userPath3d = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}${name}/${name}.sxwu`
-      console.warn(userPath3d)
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				const data = {server: path3d}
 				const result = await SScene.import3DWorkspace(data)
@@ -327,17 +320,6 @@ export default class ARMap extends React.Component<Props, State> {
 				})
 			}
       SARMap.setAction(ARAction.NULL)
-
-      // const wgPath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.Scene + '/地砖模型03/wangge'
-      // const wanggeInfo = {
-      //   server: wgPath + '.udb',
-      //   engineType: EngineType.UDB,
-      //   alias: 'wangge',
-      // }
-      // if (userPath3d && await FileTools.fileIsExist(wgPath) && !(await SMap.isDatasourceOpen(wanggeInfo))) {
-      //   const r = await SMap.openDatasource(wanggeInfo, 0)
-      //   console.warn('打开wangge', r ? '成功' : '失败')
-      // }
 		} catch(e){
 			Toast.show('添加失败')
 		}
@@ -359,30 +341,46 @@ export default class ARMap extends React.Component<Props, State> {
 		}
   }
 
-  getOnlineSceneFromUrl = (url: string): { serverUrl: string, datasetUrl: string, sceneName: string } => {
-    const pattern = /(.+\/services)\/3D-(.+)\/rest\/realspace\/scenes\/(.+)/
-    const result = url.match(pattern)
-    let servicesUrl = ''
-    let workspaceName = ''
-    let sceneName = ''
-    if (result) {
-      servicesUrl = result[1]
-      workspaceName = result[2]
-      sceneName = result[3]
-      const pat2 = /(.+)\.openrealspace$/
-      const result2 = sceneName.match(pat2)
-      if (result2) {
-        sceneName = result2[1]
-      }
-    }
-    return {
-      //http://192.168.11.117:8090/iserver/services/3D-pipe3D/rest/realspace
-      serverUrl: servicesUrl + `/3D-${workspaceName}/rest/realspace`,
-      //http://192.168.11.117:8090/iserver/services/data-DataSource2/rest/data/datasources/AR_SCENE/datasets/AR_SCENE'
-      datasetUrl: servicesUrl + `/data-${workspaceName}/rest/data/datasources/AR_SCENE/datasets/AR_SCENE111`,
-      sceneName, //: 'pipe3D',
+  /** 清除之前的数据 */
+  clearData = async () => {
+    try {
+      const homePath = await FileTools.getHomeDirectory()
+      await SARMap.close()
+      const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + DEMO_NAME}`
+      await FileTools.deleteFile(arMapPath)
+
+      const dsPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARDatasource + AR_DATASOURCE}`
+      await FileTools.deleteFile(dsPath + '.udb')
+      await FileTools.deleteFile(dsPath + '.udd')
+    } catch (e) {
+      
     }
   }
+
+  // getOnlineSceneFromUrl = (url: string): { serverUrl: string, datasetUrl: string, sceneName: string } => {
+  //   const pattern = /(.+\/services)\/3D-(.+)\/rest\/realspace\/scenes\/(.+)/
+  //   const result = url.match(pattern)
+  //   let servicesUrl = ''
+  //   let workspaceName = ''
+  //   let sceneName = ''
+  //   if (result) {
+  //     servicesUrl = result[1]
+  //     workspaceName = result[2]
+  //     sceneName = result[3]
+  //     const pat2 = /(.+)\.openrealspace$/
+  //     const result2 = sceneName.match(pat2)
+  //     if (result2) {
+  //       sceneName = result2[1]
+  //     }
+  //   }
+  //   return {
+  //     //http://192.168.11.117:8090/iserver/services/3D-pipe3D/rest/realspace
+  //     serverUrl: servicesUrl + `/3D-${workspaceName}/rest/realspace`,
+  //     //http://192.168.11.117:8090/iserver/services/data-DataSource2/rest/data/datasources/AR_SCENE/datasets/AR_SCENE'
+  //     datasetUrl: servicesUrl + `/data-${workspaceName}/rest/data/datasources/AR_SCENE/datasets/AR_SCENE111`,
+  //     sceneName, //: 'pipe3D',
+  //   }
+  // }
 
 
   /**
@@ -400,32 +398,16 @@ export default class ARMap extends React.Component<Props, State> {
           backgroundColor: 'transparent',
         }}
       >
-        {this.renderButton('校准', async() => {
+        {this.renderButton('位置校准', async() => {
           this.positionDialog?.setDialogVisible(true)
         })}
-				{this.renderButton('初始化地图', async() => {
-					const homePath = await FileTools.getHomeDirectory()
-					const datasourcePath = homePath + ConstPath.CustomerPath + ConstPath.RelativePath.ARDatasource
-					const datasourceName = AR_DATASOURCE
-					const datasetName = AR_DATASET
-					const createResult = await this.initARData(datasourcePath, datasourceName, datasetName)
-
-					// await this.init(datasourcePath, datasourceName + 1, datasetName + 1)
-          if (createResult.success) {
-            this.setState({
-              isInit: true,
-            }, () => {
-              Toast.show('初始化地图成功')
-            })
-          } else {
-            Toast.show('初始化地图失败')
-          }
-				})}
+        {/* {this.renderButton('初始化', async() => {
+          const homePath = await FileTools.getHomeDirectory()
+          const dsParentPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARDatasource}`
+          const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
+          console.warn(createResult)
+        })} */}
         {this.renderButton('打开地图', async() => {
-          if (!this.state.isCalibrate) {
-            Toast.show('请先校准')
-            return
-          }
           const homePath = await FileTools.getHomeDirectory()
           // 得到的是工作空间所在目录 需要去找到sxwu文件路径
           try {
@@ -433,8 +415,8 @@ export default class ARMap extends React.Component<Props, State> {
             if (await FileTools.fileIsExist(arMapPath)) {
               await SARMap.open(arMapPath)
               const layers = await SARMap.getLayers()
+              this.isInit = true // 直接打开地图成功,说明数据完整,设置为初始化成功
               this.setState({
-                isOpenMap: true,
                 layerName: layers[0]?.name || '',
               })
             } else {
@@ -445,49 +427,50 @@ export default class ARMap extends React.Component<Props, State> {
           }
         })}
         {this.renderButton('关闭地图', async() => {
-          if (!this.state.isOpenMap && !this.state.layerName) {
+          if (!this.isOpenMap && !this.state.layerName) {
             Toast.show('请先打开地图')
             return
           }
           try {
             await SARMap.close()
-            this.setState({
-              isOpenMap: false,
-            })
+            this.isOpenMap = false
           } catch(e) {
             
           }
         })}
-        {/* {this.renderButton('添加大厦', async() => {
-          if (!this.state.isInit) {
-            Toast.show('请先初始化地图')
-            return
-          }
-          /this.add3D(AR_DATASOURCE, AR_DATASET, 'ChengDuSuperMap')
-          const { serverUrl, sceneName, datasetUrl } = this.getOnlineSceneFromUrl("http://10.10.3.106:8090/iserver/services/3D-DiZhuanMoXing03/rest/realspace/scenes/地砖模型03")
-          const addLayerName = await SARMap.addSceneLayerOnline(AR_DATASOURCE_1, AR_DATASET_1, serverUrl, sceneName)
-        })} */}
         {this.renderButton('添加地砖', async() => {
-          if (!this.state.isInit) {
-            Toast.show('请先初始化地图')
-            return
-          }
-          if (!this.state.isCalibrate) {
+          if (!this.isCalibrate) {
             Toast.show('请先校准')
             return
           }
-          await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
-        })}
-        {/* {this.renderButton('添加Online', async() => {
-          if (!this.state.isInit) {
-            Toast.show('请先初始化地图')
-            return
+          const homePath = await FileTools.getHomeDirectory()
+          const dsParentPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARDatasource}`
+          const dsPath = dsParentPath + AR_DATASOURCE
+          if (await FileTools.fileIsExist(dsPath + '.udb')) {
+            // 若地图存在,仍然继续添加地砖,需要删除之前的数据,新建数据集和地图
+            DialogUtil.getDialog()?.set({
+              text: '添加地砖,会删除之前的地图数据,是否执行?',
+              confirmAction: async () => {
+                await this.clearData()
+                this.isInit = false
+                const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
+                createResult.success && await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
+
+                DialogUtil.getDialog()?.setVisible(false)
+              },
+              cancelAction: () => {
+                DialogUtil.getDialog()?.setVisible(false)
+              }
+            })
+            DialogUtil.getDialog()?.setVisible(true)
+          } else {
+            const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
+            if(createResult.success) {
+              await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
+            }
           }
-          // this.add3D(AR_DATASOURCE + 1, AR_DATASET + 1, '地砖模型03')
-          const url = 'http://10.10.3.106:8090/iserver/services/3D-DiZhuanMoXing03/rest/realspace/scenes/地砖模型03'
-			    const sceneName = url.substring(url.lastIndexOf('/') + 1)
-          this.add3DOnline('http://192.168.11.21:8090/iserver/services/3D-DiZhuanMoXing03/rest/realspace', sceneName)
-        })} */}
+          // await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
+        })}
         {this.renderButton('编辑图层', async() => {
 					if (!this.state.layerName) {
 						Toast.show('请先添加三位图层')
@@ -499,7 +482,7 @@ export default class ARMap extends React.Component<Props, State> {
           })
 					
         })}
-        {this.renderButton('添加KML图层', async() => {
+        {this.renderButton('添加KML', async() => {
           if (!this.state.layerName) {
             Toast.show('请先添加三位图层')
             return
@@ -527,7 +510,7 @@ export default class ARMap extends React.Component<Props, State> {
           const _layerName = await SARMap.addSceneLayerKMLByJson(JSON.stringify(dataJson), kmlPath, 'OverlayKML')
           console.warn('添加成功', _layerName)
         })}
-        {this.renderButton('移除KML图层', async() => {
+        {this.renderButton('移除KML', async() => {
 					if (!this.state.layerName) {
 						Toast.show('请先添加三位图层')
 						return
@@ -545,16 +528,15 @@ export default class ARMap extends React.Component<Props, State> {
 					
         })}
         {this.renderButton('保存地图', async() => {
-          // if (!this.state.isInit) {
-          //   Toast.show('请先初始化地图')
-          //   return
-          // }
-					// if (!this.state.layerName) {
-					// 	Toast.show('请先添加三维图层')
-					// 	return
-					// }
+          if (!this.isInit && !this.isOpenMap) {
+            Toast.show('请先初始化或打开地图')
+            return
+          }
+					if (!this.state.layerName) {
+						Toast.show('请先添加三维图层')
+						return
+					}
 		      const homePath = await FileTools.getHomeDirectory()
-          // const arMapPath = homePath + ConstPath.UserPath + USERNAME + '/' + ConstPath.RelativePath.ARMap + 'ChengDuSuperMap/ChengDuSuperMap.arxml'
           const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + this.state.layerName}/${this.state.layerName}.arxml`
 					const result = await this.saveAsARMap(arMapPath)
 
@@ -659,7 +641,7 @@ export default class ARMap extends React.Component<Props, State> {
     )
   }
 
-
+  /** 位置校准dialog */
   _renderPositionDialog = () => {
     return (
       <Dialog
@@ -668,8 +650,9 @@ export default class ARMap extends React.Component<Props, State> {
           // 位置校准
           await SARMap.calibrate(this.position.x, this.position.y, this.position.z)
           this.positionDialog?.setDialogVisible(false)
+          this.isCalibrate = true
           this.setState({
-            isCalibrate: true,
+            calibratePostion: {...this.position},
           })
         }}
         cancelAction={() => {
@@ -681,7 +664,7 @@ export default class ARMap extends React.Component<Props, State> {
             <Text style={styles.rowTitle}>x</Text>
             <TextInput
               style={styles.rowInput}
-              defaultValue={this.position.x + ''}
+              defaultValue={this.state.calibratePostion.x + ''}
               onChangeText={(text: string) => {
                 if (isNaN(parseFloat(text))) return
                 this.position.x = parseFloat(text)
@@ -693,7 +676,7 @@ export default class ARMap extends React.Component<Props, State> {
             <Text style={styles.rowTitle}>y</Text>
             <TextInput
               style={styles.rowInput}
-              defaultValue={this.position.y + ''}
+              defaultValue={this.state.calibratePostion.y + ''}
               onChangeText={(text: string) => {
                 if (isNaN(parseFloat(text))) return
                 this.position.y = parseFloat(text)
@@ -705,7 +688,7 @@ export default class ARMap extends React.Component<Props, State> {
             <Text style={styles.rowTitle}>z</Text>
             <TextInput
               style={styles.rowInput}
-              defaultValue={this.position.z + ''}
+              defaultValue={this.state.calibratePostion.z + ''}
               onChangeText={(text: string) => {
                 if (isNaN(parseFloat(text))) return
                 this.position.z = parseFloat(text)
@@ -721,14 +704,12 @@ export default class ARMap extends React.Component<Props, State> {
   render() {
     return (
       <Container
-        // withoutHeader={true}
         ref={(ref: ContainerType) => (this.container = ref)}
         navigation={this.props.navigation}
         showFullInMap={true}
         hideInBackground={false}
         headerProps={this.getHeaderProps()}
       >
-        {/* <View style={{flex: 1, backgroundColor:'yellow'}}></View> */}
         {this.renderARView()}
         {this.renderButtons()}
         {this.renderARAttribute()}

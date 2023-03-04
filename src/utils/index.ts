@@ -8,6 +8,7 @@ import FetchUtils from './FetchUtils'
 import LicenseUtil from './LicenseUtil'
 import AppEvent from './AppEvent/AppEvent'
 import * as AppLog from './AppLog'
+import DialogUtil from './DialogUtil'
 
 export {
   screen,
@@ -23,4 +24,5 @@ export {
   LicenseUtil,
   AppEvent,
   AppLog,
+  DialogUtil,
 }

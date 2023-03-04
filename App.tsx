@@ -23,9 +23,9 @@ import Root from '@/Root'
 import { ConstPath, DEFAULT_USER_NAME } from '@/constants'
 import Orientation from 'react-native-orientation'
 import { setShow } from '@/redux/reducers/device'
-import { Dialog } from '@/components';
+import { Dialog, SimpleDialog } from '@/components';
 import Loading from '@/components/Container/Loading';
-import { LicenseUtil, Toast } from '@/utils';
+import { DialogUtil, LicenseUtil, Toast } from '@/utils';
 let AppUtils = NativeModules.AppUtils
 
 interface Props {
@@ -40,7 +40,6 @@ interface State {
 type INIT_STATUS = 'permission' | 'init' | 'done'
 
 class AppRoot extends React.Component<Props, State> {
-  dialog: Dialog | null | undefined
   Loading: Loading | null | undefined
   constructor(props: Props) {
     super(props)
@@ -86,7 +85,6 @@ class AppRoot extends React.Component<Props, State> {
       if (isAllGranted && permisson11) {
         await this.init()
       } else {
-        // this.dialog?.setDialogVisible(true)
         this.requestPermission()
       }
     } catch (error) {
@@ -211,14 +209,8 @@ class AppRoot extends React.Component<Props, State> {
         {
           this.state.isInit === 'done' ? <Root /> : this.renderInitView()
         }
+        <SimpleDialog ref={ref => ref && DialogUtil.setDialog(ref)}/>
         <Loading ref={ref => this.Loading = ref} initLoading={false} />
-        {/* <Dialog
-          ref={ref => this.dialog = ref}
-          title={'111111'}
-          confirmAction={this.requestPermission}
-        >
-
-        </Dialog> */}
       </>
     )
   }
