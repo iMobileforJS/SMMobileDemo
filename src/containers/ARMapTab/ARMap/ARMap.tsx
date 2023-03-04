@@ -536,6 +536,8 @@ export default class ARMap extends React.Component<Props, State> {
 						Toast.show('请先添加三维图层')
 						return
 					}
+          // 用于修改坐标后,保存提交
+          await SARMap.submit()
 		      const homePath = await FileTools.getHomeDirectory()
           const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + this.state.layerName}/${this.state.layerName}.arxml`
 					const result = await this.saveAsARMap(arMapPath)
