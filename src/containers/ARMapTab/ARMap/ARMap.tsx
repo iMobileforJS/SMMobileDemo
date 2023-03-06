@@ -1,5 +1,5 @@
 import { Button, Container, Dialog, SlideBar } from '@/components'
-import { FileTools, SARMap, SData, SMARMapView, SScene, SAIDetectView } from 'imobile_for_reactnative'
+import { FileTools, SARMap, SData, SMARMapView, SScene, SAIDetectView, PrjCoordSysType } from 'imobile_for_reactnative'
 import React from 'react'
 import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
@@ -51,7 +51,9 @@ interface State {
 	layerName: string,
   type: '' | 'rotation',
   attribute: Array<ARAttributeType>,
+  /** 用于记录当前三维图层的经纬度坐标 */
   position: Vector3,
+  /** 用于记录校准经纬度坐标 */
   calibratePostion: Vector3,
 }
 
@@ -554,15 +556,27 @@ export default class ARMap extends React.Component<Props, State> {
         {this.renderButton('修改坐标', async() => {
           // 指定要修改位置的图层
           await SARMap.appointEditAR3DLayer(this.state.layerName)
+          // 获取墨卡托XML
+          const merctorXml = await SData.prjCoordSysToXml({type: PrjCoordSysType.PCS_SPHERE_MERCATOR, name: 'Sphere_Mercator', coordUnit: 10000, distanceUnit: 10000})
+
+          // _position记录当前修改后的经纬度位置,并保存到this.state.position中
+          // 示例:位置可来回切换
           const _position = Object.assign({}, this.state.position)
-          _position.x = _position.x === 0.5 ? 0 : 0.5
-          _position.y = _position.y === 0.5 ? 0 : 0.5
-          _position.z = _position.z === 0.5 ? 0 : 0.5
-          // 修改图层/对象位置
+          _position.x = _position.x === (this.state.calibratePostion.x + 0.00002) ? this.state.calibratePostion.x : (this.state.calibratePostion.x + 0.00002)
+          _position.y = _position.y === (this.state.calibratePostion.y + 0.00002) ? this.state.calibratePostion.y : (this.state.calibratePostion.y + 0.00002)
+          _position.z = _position.z === (this.state.calibratePostion.z + 0.5) ? this.state.calibratePostion.z : (this.state.calibratePostion.z + 0.5)
+          // 经纬度转墨卡托
+          const gpsPoints = await SData.CoordSysTranslatorGPSToPrj(merctorXml, [{x: _position.x, y: _position.y}])
+          const gpsPoint = gpsPoints[0]
+          // 墨卡托转AR坐标
+          const arPoint = await SARMap.translateGeoCoordtoAR([{x: gpsPoint.x, y: gpsPoint.y, z: 0}])
+          
+          // 修改图层/对象位置,arPoint[0]为position转换成AR坐标的位置
           await SARMap.setARElementPosition({
             layerName: this.state.layerName,
-          }, _position)
+          }, arPoint[0])
           this.setState({
+            // 记录修改后经纬度的位置
             position: _position,
           })
         })}
