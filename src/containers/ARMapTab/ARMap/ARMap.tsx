@@ -414,6 +414,7 @@ export default class ARMap extends React.Component<Props, State> {
             const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap}${DEMO_NAME}/${DEMO_NAME}.arxml`
             if (await FileTools.fileIsExist(arMapPath)) {
               await SARMap.open(arMapPath)
+              await SARMap.setAction(ARAction.NULL)
               const layers = await SARMap.getLayers()
               this.isInit = true // 直接打开地图成功,说明数据完整,设置为初始化成功
               this.setState({
@@ -433,6 +434,11 @@ export default class ARMap extends React.Component<Props, State> {
           }
           try {
             await SARMap.close()
+            this.setState({
+              layerName: '',
+              attribute: [],
+              type: '',
+            })
             this.isOpenMap = false
           } catch(e) {
             
