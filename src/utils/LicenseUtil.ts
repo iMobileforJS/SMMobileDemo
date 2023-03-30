@@ -101,7 +101,7 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
 
     let flag = false
     // 设置云许可站点
-    await SData.setCloudLicenseSite('DEFAULT')
+    await SData.setCloudLicenseSite('JP')
     await logoutCloudLicense()
 
     // 登录云许可
@@ -132,9 +132,12 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
      // 登录成功，激活许可
 
      // 登录成功之后需要先查询许可，才能成功激活有效的许可
-     await queryCloudLicense()
+     const license = await queryCloudLicense()
      // 激活云许可
-     flag = await applyCloudTrialLicense()
+     if (license?.licenses[0].id) {
+      licenseCurrentType = 'cloud'
+      flag = !!await SData.applyCloudLicense(license?.licenses[0].id)
+     }
     }
     return flag
   } catch (error) {
@@ -214,7 +217,7 @@ async function applyCloudTrialLicense(): Promise<boolean> {
   try {
     if(licenseCurrentType === 'offline'){
       // 归还离线许可
-      let serialNumber = await SData.initSerialNumber('')
+      let serialNumber = await SData.initSerialNumber()
       if (serialNumber !== '') {
         // await SData.reloadLocalLicense()
         let result = await SData.recycleLicense()

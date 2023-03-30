@@ -49,6 +49,7 @@ interface State {
   isAvailable: boolean,
 	name3D: string,
 	layerName: string,
+	kmlLayerName: string,
   type: '' | 'rotation',
   attribute: Array<ARAttributeType>,
   /** 用于记录当前三维图层的经纬度坐标 */
@@ -77,6 +78,7 @@ export default class ARMap extends React.Component<Props, State> {
       isAvailable: false,
 			name3D: '',
 			layerName: '',
+			kmlLayerName: '',
       type: '',
       attribute: [],
       position: {x: 0, y: 0, z: 0},
@@ -101,8 +103,8 @@ export default class ARMap extends React.Component<Props, State> {
       return false
     }
     // 设置点击对象显示属性监听
-    await SARMap.addAttributeListener({
-      callback: async (result: any) => {
+    await SARMap.setScene3DAttributeListener(
+      async (result: any) => {
         try {
           const arr: Array<ARAttributeType> = []
           if (result) {
@@ -123,15 +125,10 @@ export default class ARMap extends React.Component<Props, State> {
           })
         }
       },
-    })
+    )
   }
 
   initSetting = () => {
-    if (Platform.OS === 'android') {
-      SARMap.showPointCloud(true)
-    } else {
-      SARMap.setMeasureMode('arCollect')
-    }
   }
 
   /**
@@ -257,7 +254,7 @@ export default class ARMap extends React.Component<Props, State> {
     if (!this.state.isAvailable) return null
     return (
       <SMARMapView
-        moduleId={255}
+        moduleId={0x10}
         onLoad={this.initSetting}
         onARElementTouch={element => {
           
@@ -314,7 +311,7 @@ export default class ARMap extends React.Component<Props, State> {
 				return
 			}
 			// 添加三维图层
-			const addLayerName = await SARMap.addSceneLayer(datasourceName, datasetName, userPath3d)
+			const addLayerName = await SARMap.addSceneLayer({datasourceName, datasetName}, userPath3d)
 			if(addLayerName !== ''){
 				this.setState({
           name3D: name,
@@ -330,7 +327,10 @@ export default class ARMap extends React.Component<Props, State> {
 	/** 添加Online三维图层 */
   add3DOnline = async (url: string, name: string) => {
 		try {
-			const addLayerName = await SARMap.addSceneLayerOnline(AR_DATASOURCE + 1, AR_DATASET + 1, url, name)
+			const addLayerName = await SARMap.addSceneLayerOnline({
+        datasourceName: AR_DATASOURCE + 1,
+        datasetName: AR_DATASET + 1,
+      }, url, name)
 			if(addLayerName !== ''){
 				Toast.show('添加三维图层成功: ' + addLayerName)
 				this.setState({
@@ -384,6 +384,220 @@ export default class ARMap extends React.Component<Props, State> {
   //   }
   // }
 
+  /** 打开地图 */
+  openMap = async() => {
+    const homePath = await FileTools.getHomeDirectory()
+    // 得到的是工作空间所在目录 需要去找到sxwu文件路径
+    try {
+      const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap}${DEMO_NAME}/${DEMO_NAME}.arxml`
+      if (await FileTools.fileIsExist(arMapPath)) {
+        await SARMap.open(arMapPath)
+        await SARMap.setAction(ARAction.NULL)
+        const layers = await SARMap.getLayers()
+        this.isInit = true // 直接打开地图成功,说明数据完整,设置为初始化成功
+        this.setState({
+          layerName: layers[0]?.name || '',
+        })
+      } else {
+        Toast.show('打开地图失败,请检查数据是否存在')
+      }
+    } catch(e) {
+      Toast.show('打开地图失败,请检查数据是否存在')
+    }
+  }
+
+  /** 关闭地图 */
+  closeMap = async() => {
+    if (!this.isOpenMap && !this.state.layerName) {
+      Toast.show('请先打开地图')
+      return
+    }
+    try {
+      await SARMap.close()
+      this.setState({
+        layerName: '',
+        attribute: [],
+        type: '',
+      })
+      this.isOpenMap = false
+    } catch(e) {
+      
+    }
+  }
+
+  /** 添加场景图层 */
+  addScenceLayer = async() => {
+    if (!this.isCalibrate) {
+      Toast.show('请先校准')
+      return
+    }
+    const homePath = await FileTools.getHomeDirectory()
+    const dsParentPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARDatasource}`
+    const dsPath = dsParentPath + AR_DATASOURCE
+    if (await FileTools.fileIsExist(dsPath + '.udb')) {
+      // 若地图存在,仍然继续添加地砖,需要删除之前的数据,新建数据集和地图
+      DialogUtil.getDialog()?.set({
+        text: '添加地砖,会删除之前的地图数据,是否执行?',
+        confirmAction: async () => {
+          await this.clearData()
+          this.isInit = false
+          const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
+          createResult.success && await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
+
+          DialogUtil.getDialog()?.setVisible(false)
+        },
+        cancelAction: () => {
+          DialogUtil.getDialog()?.setVisible(false)
+        }
+      })
+      DialogUtil.getDialog()?.setVisible(true)
+    } else {
+      const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
+      if(createResult.success) {
+        await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
+      }
+    }
+    // await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
+  }
+
+  /** 编辑图层 */
+  editLayer = async() => {
+    if (!this.state.layerName) {
+      Toast.show('请先添加三位图层')
+      return
+    }
+    await SARMap.appointEditAR3DLayer(this.state.layerName)
+    this.setState({
+      type: 'rotation',
+    })
+    
+  }
+
+  /** 添加KML */
+  addKML = async () => {
+    if (!this.state.layerName) {
+      Toast.show('请先添加三位图层')
+      return
+    }
+    const layerName = 'OverlayKML'
+
+    const geometries = wangge.geometries
+
+    // 自定义颜色示例
+    // for(const geometrie of geometries) {
+    //   const style = new GeoStyle3D()
+    //   style.setAltitudeMode(2)
+    //   style.setFillForeColor(255, 0, 0, 1)
+    //   geometrie.style = style
+    // }
+
+    const dataJson = {
+      layerName: layerName,
+      geometries: geometries,
+    }
+    const homePath = await FileTools.getHomeDirectory()
+    // const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${this.state.name3D}/kml/files/${this.state.name3D}.kml`
+    const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}${this.state.name3D}/kml/files/wangge.kml`
+
+
+    // const _layerName = await SARMap.addSceneLayerKMLByJson(JSON.stringify(dataJson), kmlPath, 'OverlayKML')
+    const _layerName = await SARMap.add3DLayer(this.state.layerName, 'OverlayKML', kmlPath)
+    console.warn('添加成功', _layerName, this.state.layerName, kmlPath)
+    this.setState({
+      kmlLayerName: _layerName,
+    })
+  }
+
+  /** 移除KML */
+  removeKML = async () => {
+    if (!this.state.layerName) {
+      Toast.show('请先添加三位图层')
+      return
+    }
+    // this.visible = !this.visible
+    // await SARMap.setLayerVisible(this.state.layerName, this.visible)
+    // await SARMap.removeSceneLayer('OverlayKML')
+    await SARMap.removeARLayer('OverlayKML')
+  }
+
+  /** 保存KML */
+  saveKML = async() => {
+    const homePath = await FileTools.getHomeDirectory()
+    const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}${this.state.name3D}/kml/files/wangge${new Date().toUTCString()}.kml`
+    // await SARMap.saveSceneLayerKML('OverlayKML', kmlPath)
+    await SARMap.save3DLayerAsKml('OverlayKML', kmlPath)
+  }
+
+  /** 保存地图 */
+  saveMap = async() => {
+    if (!this.isInit && !this.isOpenMap) {
+      Toast.show('请先初始化或打开地图')
+      return
+    }
+    if (!this.state.layerName) {
+      Toast.show('请先添加三维图层')
+      return
+    }
+    // 用于修改坐标后,保存提交
+    await SARMap.submit()
+    const homePath = await FileTools.getHomeDirectory()
+    const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + this.state.layerName}/${this.state.layerName}.arxml`
+    const result = await this.saveAsARMap(arMapPath)
+
+    Toast.show('保存地图' + (result ? '成功' : '失败'))
+    
+  }
+
+  /** 修改KML位置 */
+  changeKMLPosition = async() => {
+
+    // _position记录当前修改后的经纬度位置,并保存到this.state.position中
+    // 示例:位置可来回切换
+    const _position = Object.assign({}, this.state.position)
+    _position.x = _position.x === (this.state.calibratePostion.x + 0.00002) ? this.state.calibratePostion.x : (this.state.calibratePostion.x + 0.00002)
+    _position.y = _position.y === (this.state.calibratePostion.y + 0.00002) ? this.state.calibratePostion.y : (this.state.calibratePostion.y + 0.00002)
+    _position.z = _position.z === (this.state.calibratePostion.z + 0.5) ? this.state.calibratePostion.z : (this.state.calibratePostion.z + 0.5)
+
+
+    const mapPrj = await SARMap.getPrjCoordSys()
+    const mapPrjObj = await SData.prjCoordSysFromXml(mapPrj)
+
+    let moveToPosition
+
+    // 若地图坐标系是墨卡托，则需要先把经纬度转成墨卡托
+    if (mapPrjObj?.type === PrjCoordSysType.PCS_SPHERE_MERCATOR) {
+      // 获取墨卡托XML
+      const merctorXml = await SData.prjCoordSysToXml({type: PrjCoordSysType.PCS_SPHERE_MERCATOR, name: 'Sphere_Mercator', coordUnit: 10000, distanceUnit: 10000})
+      // 经纬度转墨卡托
+      const gpsPoints = await SData.CoordSysTranslatorGPSToPrj(merctorXml, [{x: _position.x, y: _position.y}])
+      const gpsPoint = gpsPoints[0]
+      moveToPosition = {x: gpsPoint.x, y: gpsPoint.y, z: gpsPoint.z}
+    } else {
+      moveToPosition = {x: _position.x, y: _position.y, z: _position.z}
+    }
+
+    // 墨卡托转AR坐标
+    const arPoint = await SARMap.CoordSysTranslatorMapPrjToAR([{x: moveToPosition.x, y: moveToPosition.y, z: moveToPosition.z}])
+    
+    // 指定要编辑的三维图层
+    await SARMap.appointEditAR3DLayer('地砖模型@wangge#1')
+    // 以下是修改位置的三种方式
+    // 1. 设置 AR 3维图层 (AR3DLayer) 相对于场景图层（ARSceneLayer）的局部坐标
+    // await SARMap.setAR3DLayerLocalPosition('地砖模型@wangge#1', arPoint[0])
+
+    // 2. 设置 AR 3维图层 (AR3DLayer) 的AR坐标
+    await SARMap.setAR3DLayerPosition('地砖模型@wangge#1', arPoint[0])
+
+    // 3. 设置 AR 场景图层 (ARSceneLayer) 的AR坐标
+    // 指定要编辑的三维场景图层
+    // await SARMap.appointEditAR3DLayer(this.state.layerName)
+    // await SARMap.setARSceneLayerPosition(this.state.layerName, arPoint[0])
+    
+    this.setState({
+      // 记录修改后经纬度的位置
+      position: _position,
+    })
+  }
 
   /**
    * 右边按钮
@@ -409,177 +623,15 @@ export default class ARMap extends React.Component<Props, State> {
           const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
           console.warn(createResult)
         })} */}
-        {this.renderButton('打开地图', async() => {
-          const homePath = await FileTools.getHomeDirectory()
-          // 得到的是工作空间所在目录 需要去找到sxwu文件路径
-          try {
-            const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap}${DEMO_NAME}/${DEMO_NAME}.arxml`
-            if (await FileTools.fileIsExist(arMapPath)) {
-              await SARMap.open(arMapPath)
-              await SARMap.setAction(ARAction.NULL)
-              const layers = await SARMap.getLayers()
-              this.isInit = true // 直接打开地图成功,说明数据完整,设置为初始化成功
-              this.setState({
-                layerName: layers[0]?.name || '',
-              })
-            } else {
-              Toast.show('打开地图失败,请检查数据是否存在')
-            }
-          } catch(e) {
-            Toast.show('打开地图失败,请检查数据是否存在')
-          }
-        })}
-        {this.renderButton('关闭地图', async() => {
-          if (!this.isOpenMap && !this.state.layerName) {
-            Toast.show('请先打开地图')
-            return
-          }
-          try {
-            await SARMap.close()
-            this.setState({
-              layerName: '',
-              attribute: [],
-              type: '',
-            })
-            this.isOpenMap = false
-          } catch(e) {
-            
-          }
-        })}
-        {this.renderButton('添加地砖', async() => {
-          if (!this.isCalibrate) {
-            Toast.show('请先校准')
-            return
-          }
-          const homePath = await FileTools.getHomeDirectory()
-          const dsParentPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARDatasource}`
-          const dsPath = dsParentPath + AR_DATASOURCE
-          if (await FileTools.fileIsExist(dsPath + '.udb')) {
-            // 若地图存在,仍然继续添加地砖,需要删除之前的数据,新建数据集和地图
-            DialogUtil.getDialog()?.set({
-              text: '添加地砖,会删除之前的地图数据,是否执行?',
-              confirmAction: async () => {
-                await this.clearData()
-                this.isInit = false
-                const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
-                createResult.success && await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
-
-                DialogUtil.getDialog()?.setVisible(false)
-              },
-              cancelAction: () => {
-                DialogUtil.getDialog()?.setVisible(false)
-              }
-            })
-            DialogUtil.getDialog()?.setVisible(true)
-          } else {
-            const createResult = await this.initARData(dsParentPath, AR_DATASOURCE, AR_DATASET)
-            if(createResult.success) {
-              await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
-            }
-          }
-          // await this.add3D(AR_DATASOURCE, AR_DATASET, DEMO_NAME)
-        })}
-        {this.renderButton('编辑图层', async() => {
-					if (!this.state.layerName) {
-						Toast.show('请先添加三位图层')
-						return
-					}
-          await SARMap.appointEditAR3DLayer(this.state.layerName)
-          this.setState({
-            type: 'rotation',
-          })
-					
-        })}
-        {this.renderButton('添加KML', async() => {
-          if (!this.state.layerName) {
-            Toast.show('请先添加三位图层')
-            return
-          }
-          const layerName = 'OverlayKML'
-
-          const geometries = wangge.geometries
-
-          // 自定义颜色示例
-          // for(const geometrie of geometries) {
-          //   const style = new GeoStyle3D()
-          //   style.setAltitudeMode(2)
-          //   style.setFillForeColor(255, 0, 0, 1)
-          //   geometrie.style = style
-          // }
-
-          const dataJson = {
-            layerName: layerName,
-            geometries: geometries,
-          }
-          const homePath = await FileTools.getHomeDirectory()
-          const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${this.state.name3D}/kml/files/${this.state.name3D}.kml`
-
-
-          const _layerName = await SARMap.addSceneLayerKMLByJson(JSON.stringify(dataJson), kmlPath, 'OverlayKML')
-          console.warn('添加成功', _layerName)
-        })}
-        {this.renderButton('移除KML', async() => {
-					if (!this.state.layerName) {
-						Toast.show('请先添加三位图层')
-						return
-					}
-          // this.visible = !this.visible
-          // await SARMap.setLayerVisible(this.state.layerName, this.visible)
-          await SARMap.removeSceneLayer('OverlayKML')
-					
-        })}
-        {this.renderButton('保存KML', async() => {
-
-          const homePath = await FileTools.getHomeDirectory()
-          const kmlPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}/${this.state.name3D}/kml/files/${this.state.name3D}.kml`
-          await SARMap.saveSceneLayerKML('OverlayKML', kmlPath)
-					
-        })}
-        {this.renderButton('保存地图', async() => {
-          if (!this.isInit && !this.isOpenMap) {
-            Toast.show('请先初始化或打开地图')
-            return
-          }
-					if (!this.state.layerName) {
-						Toast.show('请先添加三维图层')
-						return
-					}
-          // 用于修改坐标后,保存提交
-          await SARMap.submit()
-		      const homePath = await FileTools.getHomeDirectory()
-          const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + this.state.layerName}/${this.state.layerName}.arxml`
-					const result = await this.saveAsARMap(arMapPath)
-
-					Toast.show('保存地图' + (result ? '成功' : '失败'))
-					
-        })}
-        {this.renderButton('修改坐标', async() => {
-          // 指定要修改位置的图层
-          await SARMap.appointEditAR3DLayer(this.state.layerName)
-          // 获取墨卡托XML
-          const merctorXml = await SData.prjCoordSysToXml({type: PrjCoordSysType.PCS_SPHERE_MERCATOR, name: 'Sphere_Mercator', coordUnit: 10000, distanceUnit: 10000})
-
-          // _position记录当前修改后的经纬度位置,并保存到this.state.position中
-          // 示例:位置可来回切换
-          const _position = Object.assign({}, this.state.position)
-          _position.x = _position.x === (this.state.calibratePostion.x + 0.00002) ? this.state.calibratePostion.x : (this.state.calibratePostion.x + 0.00002)
-          _position.y = _position.y === (this.state.calibratePostion.y + 0.00002) ? this.state.calibratePostion.y : (this.state.calibratePostion.y + 0.00002)
-          _position.z = _position.z === (this.state.calibratePostion.z + 0.5) ? this.state.calibratePostion.z : (this.state.calibratePostion.z + 0.5)
-          // 经纬度转墨卡托
-          const gpsPoints = await SData.CoordSysTranslatorGPSToPrj(merctorXml, [{x: _position.x, y: _position.y}])
-          const gpsPoint = gpsPoints[0]
-          // 墨卡托转AR坐标
-          const arPoint = await SARMap.translateGeoCoordtoAR([{x: gpsPoint.x, y: gpsPoint.y, z: 0}])
-          
-          // 修改图层/对象位置,arPoint[0]为position转换成AR坐标的位置
-          await SARMap.setARElementPosition({
-            layerName: this.state.layerName,
-          }, arPoint[0])
-          this.setState({
-            // 记录修改后经纬度的位置
-            position: _position,
-          })
-        })}
+        {this.renderButton('打开地图', this.openMap)}
+        {this.renderButton('关闭地图', this.closeMap)}
+        {this.renderButton('添加地砖', this.addScenceLayer)}
+        {this.renderButton('编辑图层', this.editLayer)}
+        {this.renderButton('添加KML', this.addKML)}
+        {this.renderButton('移除KML', this.removeKML)}
+        {this.renderButton('保存KML', this.saveKML)}
+        {this.renderButton('保存地图', this.saveMap)}
+        {this.renderButton('修改坐标', this.changeKMLPosition)}
       </ScrollView>
     )
   }
