@@ -311,7 +311,7 @@ export default class ARMap extends React.Component<Props, State> {
 				return
 			}
 			// 添加三维图层
-			const addLayerName = await SARMap.addSceneLayer({datasourceName, datasetName}, userPath3d)
+			const addLayerName = await SARMap.addSceneLayer({datasourceName, datasetName}, userPath3d,undefined,{childCoordSysType:1})
 			if(addLayerName !== ''){
 				this.setState({
           name3D: name,
@@ -587,12 +587,14 @@ export default class ARMap extends React.Component<Props, State> {
 
     // 2. 设置 AR 3维图层 (AR3DLayer) 的AR坐标
     await SARMap.setAR3DLayerPosition('地砖模型@wangge#1', arPoint[0])
+    // await SARMap.setAR3DLayerPosition('OverlayKML', arPoint[0])
 
     // 3. 设置 AR 场景图层 (ARSceneLayer) 的AR坐标
     // 指定要编辑的三维场景图层
     // await SARMap.appointEditAR3DLayer(this.state.layerName)
     // await SARMap.setARSceneLayerPosition(this.state.layerName, arPoint[0])
-    
+    //提交更改,若不调该方法，修改将不会持久化
+    await SARMap.submit()
     this.setState({
       // 记录修改后经纬度的位置
       position: _position,
