@@ -68,13 +68,6 @@
 			remoteGlobalIDString = 0AA85F2D27D5D58C0067CB94;
 			remoteInfo = SMSuperMap;
 		};
-		0AAB0F9E29B09DB1004028AE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0AAB0F9929B09DB1004028AE /* Supermap.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 134814201AA4EA6300B7C361;
-			remoteInfo = Supermap;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -128,7 +121,6 @@
 		0A44181727CE1CEE00DDF353 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		0A9C0897299F229100B164C4 /* SuperMapAI.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SuperMapAI.bundle; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/SuperMapAI.bundle; sourceTree = "<group>"; };
 		0AA85F3B27D5D6300067CB94 /* SMSuperMap.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SMSuperMap.xcodeproj; path = ../node_modules/imobile_for_reactnative/ios/SMSuperMap.xcodeproj; sourceTree = "<group>"; };
-		0AAB0F9929B09DB1004028AE /* Supermap.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Supermap.xcodeproj; path = ../../iTablet/imobile_for_reactnative/ios/Supermap.xcodeproj; sourceTree = "<group>"; };
 		0ADF6213299636F000171B69 /* SuperMapAR.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = SuperMapAR.bundle; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/SuperMapAR.bundle; sourceTree = "<group>"; };
 		0ADF62152996376900171B69 /* resources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = resources.bundle; path = ../node_modules/imobile_for_reactnative/ios/iPhoneOS.sdk/SuperMap.framework/Versions/A/Resources/resources.bundle; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* SMMobileDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SMMobileDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -221,14 +213,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0AAB0F9A29B09DB1004028AE /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				0AAB0F9F29B09DB1004028AE /* libSupermap.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		13B07FAE1A68108700A75B9A /* SMMobileDemo */ = {
 			isa = PBXGroup;
 			children = (
@@ -297,7 +281,6 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				0AAB0F9929B09DB1004028AE /* Supermap.xcodeproj */,
 				0AA85F3B27D5D6300067CB94 /* SMSuperMap.xcodeproj */,
 			);
 			name = Libraries;
@@ -407,10 +390,6 @@
 					ProductGroup = 0AA85F3C27D5D6300067CB94 /* Products */;
 					ProjectRef = 0AA85F3B27D5D6300067CB94 /* SMSuperMap.xcodeproj */;
 				},
-				{
-					ProductGroup = 0AAB0F9A29B09DB1004028AE /* Products */;
-					ProjectRef = 0AAB0F9929B09DB1004028AE /* Supermap.xcodeproj */;
-				},
 			);
 			projectRoot = "";
 			targets = (
@@ -426,13 +405,6 @@
 			fileType = archive.ar;
 			path = libSMSuperMap.a;
 			remoteRef = 0AA85F3F27D5D6300067CB94 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		0AAB0F9F29B09DB1004028AE /* libSupermap.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSupermap.a;
-			remoteRef = 0AAB0F9E29B09DB1004028AE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
