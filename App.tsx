@@ -71,8 +71,8 @@ class AppRoot extends React.Component<Props, State> {
         'android.permission.ACCESS_FINE_LOCATION',
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.WRITE_EXTERNAL_STORAGE',
-        // 'android.permission.CAMERA',
-        // 'android.permission.RECORD_AUDIO',
+        'android.permission.CAMERA',
+        'android.permission.RECORD_AUDIO',
       ])
       let isAllGranted = true
       for (let key in results) {
@@ -83,6 +83,9 @@ class AppRoot extends React.Component<Props, State> {
       let permisson11 = await AppUtils.requestStoragePermissionR()
       console.warn(isAllGranted, permisson11)
       if (isAllGranted && permisson11) {
+        // 申请权限后，调用SData.setPermission(true)
+        // 注: 调用SData.setPermission，只需要读写权限，android11以上使用AppUtils.requestStoragePermissionR()
+        await SData.setPermission(true)
         await this.init()
       } else {
         this.requestPermission()
@@ -137,7 +140,7 @@ class AppRoot extends React.Component<Props, State> {
     try {
       await AppInfo.setRootPath('/' + ConstPath.AppPath.replace(/\//g, '')) // 设置根目录名
       await AppInfo.setUserName(DEFAULT_USER_NAME) // 初始化用户
-      await FileTools.initUserDefaultData(DEFAULT_USER_NAME) // 初始化文件目录
+      await AppInfo.initUserEnvironment(DEFAULT_USER_NAME) // 初始化文件目录
     } catch (error) {
       console.warn('initEnvironment error')
     }

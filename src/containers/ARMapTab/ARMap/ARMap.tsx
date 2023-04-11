@@ -541,7 +541,7 @@ export default class ARMap extends React.Component<Props, State> {
     // 用于修改坐标后,保存提交
     await SARMap.submit()
     const homePath = await FileTools.getHomeDirectory()
-    const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap + this.state.layerName}/${this.state.layerName}.arxml`
+    const arMapPath = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativePath.ARMap}/${this.state.layerName}.arxml`
     const result = await this.saveAsARMap(arMapPath)
 
     Toast.show('保存地图' + (result ? '成功' : '失败'))
