@@ -101,7 +101,8 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
 
     let flag = false
     // 设置云许可站点
-    await SData.setCloudLicenseSite('JP')
+    // await SData.setCloudLicenseSite('JP') //日本站点
+    await SData.setCloudLicenseSite('DEFAULT')
     await logoutCloudLicense()
 
     // 登录云许可
@@ -130,13 +131,16 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
       await logoutCloudLicense()
     } else {
      // 登录成功，激活许可
+     
 
      // 登录成功之后需要先查询许可，才能成功激活有效的许可
      const license = await queryCloudLicense()
      // 激活云许可
-     if (license?.licenses[0].id) {
+     if (license?.licenses?.[0]?.id) {
       licenseCurrentType = 'cloud'
       flag = !!await SData.applyCloudLicense(license?.licenses[0].id)
+     } else if (license?.isStaff || license?.hasTiral) {
+      flag = await applyCloudTrialLicense()
      }
     }
     return flag
@@ -261,11 +265,12 @@ async function applyCloudTrialLicense(): Promise<boolean> {
  * 登出云许可
  * @returns
  */
-async function logoutCloudLicense(): Promise<void> {
+async function logoutCloudLicense(): Promise<boolean> {
   try {
-    SData.logoutCloudLicense()
+    return await SData.logoutCloudLicense()
   } catch (error) {
     console.warn("登出失败")
+    return false
   }
 }
 
