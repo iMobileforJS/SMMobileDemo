@@ -139,7 +139,7 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
      if (license?.licenses?.[0]?.id) {
       licenseCurrentType = 'cloud'
       flag = !!await SData.applyCloudLicense(license?.licenses[0].id)
-     } else if (license?.isStaff || license?.hasTiral) {
+     } else if (license?.isStaff || license?.hasTrial) {
       flag = await applyCloudTrialLicense()
      }
     }
