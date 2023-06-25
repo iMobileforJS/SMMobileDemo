@@ -1,5 +1,5 @@
 import { Button, Container, Dialog, SlideBar } from '@/components'
-import { FileTools, SARMap, SData, SMARMapView, SScene, SAIDetectView, PrjCoordSysType } from 'imobile_for_reactnative'
+import { FileTools, SARMap, SData, SMARMapView, SScene, PrjCoordSysType } from 'imobile_for_reactnative'
 import React from 'react'
 import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
@@ -12,7 +12,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { ARAttributeTable } from '@/containers/components'
 import { ARAttributeType } from '@/containers/components/ARAttributeTable/ARAttributeTable'
 import wangge from './wangge.json'
-import { DatasetType, EngineType, Vector3 } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
+import { DatasetType, EngineType, Vector3, WorkspaceType } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
 import { ARAction, IARTransform } from 'imobile_for_reactnative/NativeModule/interfaces/ar/SARMap'
 
 const styles = StyleSheet.create({
@@ -88,34 +88,44 @@ export default class ARMap extends React.Component<Props, State> {
 
   async componentDidMount() {
     // ARView系统版本是否支持 Anroid Only
-    const isAvailable = await SAIDetectView.checkIfAvailable()
-    if (!isAvailable) {
+    const isAvailable = await SARMap.isSupportAR()
+    if (isAvailable !== 1) {
+      // console.warn(isAvailable)
       Toast.show('该设备不支持AR')
       return false
     }
-    // ARView需要的传感器是否可用
-    if (await SAIDetectView.checkIfSensorsAvailable()) {
-      this.setState({
-        isAvailable: true,
-      })
-    } else {
-      Toast.show('该设备不支持AR')
-      return false
-    }
+    this.setState({isAvailable: isAvailable === 1})
+    // // ARView需要的传感器是否可用
+    // if (await SAIDetectView.checkIfSensorsAvailable()) {
+    //   this.setState({
+    //     isAvailable: true,
+    //   })
+    // } else {
+    //   Toast.show('该设备不支持AR')
+    //   return false
+    // }
     // 设置点击对象显示属性监听
-    await SARMap.setScene3DAttributeListener(
-      async (result: any) => {
+    await SARMap.setAR3DLayerSelectListener(
+      async (result) => {
         try {
+          const fieldinfos = await SARMap.getAR3DLayerFieldValueOfSelectedObject(result.layerName)
+
           const arr: Array<ARAttributeType> = []
-          if (result) {
-            const keys = Object.keys(result)
-            keys.forEach(key => {
-              arr.push({
-                title: key,
-                value: result[key],
-              })
+          fieldinfos.forEach(item =>{
+            arr.push({
+              title: item.name,
+              value: item.value
             })
-          }
+          })
+          // if (result) {
+            // const keys = Object.keys(result)
+            // keys.forEach(key => {
+            //   arr.push({
+            //     title: key,
+            //     value: result[key],
+            //   })
+            // })
+          // }
           this.setState({
             attribute: arr,
           })
@@ -254,7 +264,7 @@ export default class ARMap extends React.Component<Props, State> {
     if (!this.state.isAvailable) return null
     return (
       <SMARMapView
-        moduleId={0x10}
+        // moduleId={0x10}
         onLoad={this.initSetting}
         onARElementTouch={element => {
           
@@ -304,7 +314,7 @@ export default class ARMap extends React.Component<Props, State> {
 			const userPath3d = `${homePath + ConstPath.UserPath + USERNAME}/${ConstPath.RelativeFilePath.Scene}${name}/${name}.sxwu`
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				const data = {server: path3d}
-				const result = await SScene.import3DWorkspace(data)
+				const result = await SData.import3DWorkspace({...data, type: WorkspaceType.SXWU})
 			}
 			if (!await FileTools.fileIsExist(userPath3d)) {
 				Toast.show('三维数据不存在')
@@ -572,7 +582,7 @@ export default class ARMap extends React.Component<Props, State> {
       // 经纬度转墨卡托
       const gpsPoints = await SData.CoordSysTranslatorGPSToPrj(merctorXml, [{x: _position.x, y: _position.y}])
       const gpsPoint = gpsPoints[0]
-      moveToPosition = {x: gpsPoint.x, y: gpsPoint.y, z: gpsPoint.z}
+      moveToPosition = {x: gpsPoint.x, y: gpsPoint.y, z: 0}
     } else {
       moveToPosition = {x: _position.x, y: _position.y, z: _position.z}
     }

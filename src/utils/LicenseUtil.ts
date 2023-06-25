@@ -22,7 +22,7 @@
  * 
  */
 
-import { SData } from "imobile_for_reactnative"
+import { SData, SOnline, URL } from "imobile_for_reactnative"
 import Toast from "./Toast"
 
 interface licenseResultType extends SData.QueryCloudLicenseResult{
@@ -102,7 +102,21 @@ async function loginCloudLicense(user: string, pwd: string): Promise<boolean> {
     let flag = false
     // 设置云许可站点
     // await SData.setCloudLicenseSite('JP') //日本站点
-    await SData.setCloudLicenseSite('DEFAULT')
+    // await SData.setCloudLicenseSite('DEFAULT')
+
+    // await SOnline.setServerUrl({
+    //   url: 'https://online.supermap.jp',
+    //   ssoUrl: 'https://sso.supermap.jp',
+    //   licenseUrl: 'https://license.supermap.jp',
+    // })
+
+
+    await SOnline.setServerUrl({
+      url: URL.ONLINE_URL,
+      ssoUrl: URL.SSO_URL,
+      licenseUrl: URL.LICENSE_URL,
+    })
+
     await logoutCloudLicense()
 
     // 登录云许可
@@ -221,28 +235,13 @@ async function applyCloudTrialLicense(): Promise<boolean> {
   try {
     if(licenseCurrentType === 'offline'){
       // 归还离线许可
-      let serialNumber = await SData.initSerialNumber()
-      if (serialNumber !== '') {
-        // await SData.reloadLocalLicense()
-        let result = await SData.recycleLicense()
-        if(result) {
-          licenseCurrentType = null
-          Toast.show("归还离线许可成功")
-        } else {
-          Toast.show("归还离线许可失败")
-        }
+      let result = await SData.recycleLicense()
+      if(result) {
+        licenseCurrentType = null
+        Toast.show("归还离线许可成功")
       } else {
-        // 清除本地许可文件
-        let result = await SData.clearLocalLicense()
-        if(result) {
-          licenseCurrentType = null
-          Toast.show("归还离线许可成功")
-        } else {
-          Toast.show("归还离线许可失败")
-         
-        }
+        Toast.show("归还离线许可失败")
       }
-      
     } else if(licenseCurrentType === 'cloud') {
       // 归还云许可
       let days = await SData.recycleCloudLicense('', '')

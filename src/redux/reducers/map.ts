@@ -1,3 +1,11 @@
+/*
+ * @Author: xiezhiyan xiezhiyanfighting@163.com
+ * @Date: 2023-03-30 13:44:44
+ * @LastEditors: xiezhiyan xiezhiyanfighting@163.com
+ * @LastEditTime: 2023-06-25 09:47:40
+ * @FilePath: /SMMobileDemo/src/redux/reducers/map.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { ThunkAction } from "redux-thunk"
 import { fromJS } from 'immutable'
 import { handleActions } from 'redux-actions'
@@ -37,21 +45,26 @@ export const openMap = (
     const module = ''
     const fileName = params.name
     const isCustomerPath = params.path.indexOf(ConstPath.CustomerPath) >= 0
-    const importResult = await SMap.openMapName(fileName, {
-      Module: module,
-      IsPrivate: !isCustomerPath,
-    })
+    const importResult = await SMap.openMapName(fileName)
     const expFilePath = `${absolutePath.substr(
       0,
       absolutePath.lastIndexOf('.'),
     )}.exp`
-    const openMapResult = importResult && (await SMap.openMap(fileName))
-    const currentMapInfo = await SMap.getMapInfo()
-    if (openMapResult) {
+    // const openMapResult = importResult && (await SMap.openMap(fileName))
+    // const currentMapInfo = await SMap.getMapInfo()
+    if (importResult) {
       const expIsExist = await FileTools.fileIsExist(expFilePath)
       if (expIsExist) {
         const data = await fs.readFile(expFilePath)
-        const mapInfo: MapInfo = Object.assign(currentMapInfo, JSON.parse(data), { path: params.path })
+        // const mapInfo: MapInfo = Object.assign(currentMapInfo, JSON.parse(data), { path: params.path })
+
+        const mName = await SMap.getMapName()
+   
+        const mapInfo: MapInfo = {
+          name: mName,
+          path: params.path
+        }
+        
         await dispatch({
           type: OPEN_MAP,
           payload: params || {},

@@ -200,7 +200,7 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
           return
         }
         this.container?.setLoading(true, text)
-        const mapInfo = await SMap.getMapInfo()
+        const mapInfo = await SMap.getMapCenter()
         if(mapInfo){
           // 当前有地图打开了
           // 关闭当前打开的地图
@@ -267,17 +267,24 @@ export default class MapView<P, S> extends React.Component<MapViewProps & P, Sta
         0,
         absolutePath.lastIndexOf('.'),
       )}.exp`
-      const currentMapInfo = await SMap.getMapInfo()
+      // const currentMapInfo = await SMap.getMapInfo()
+      const mName = await SMap.getMapName()
       if (openMapResult) {
         const expIsExist = await FileTools.fileIsExist(expFilePath)
         if (expIsExist) {
           const data = await fs.readFile(expFilePath)
-          const mapInfo: MapInfo = Object.assign(currentMapInfo, JSON.parse(data), { path: params.path })
+          
+   
+          const mapInfo: MapInfo = {
+            name: mName,
+            path: params.path
+          }
+          // const mapInfo: MapInfo = Object.assign(currentMapInfo, JSON.parse(data), { path: params.path })
           this.currentMap = {...params}
           return mapInfo
         } else {
           this.currentMap = {...params}
-          return currentMapInfo
+          return {name: mName}
         }
       } else {
         return undefined
