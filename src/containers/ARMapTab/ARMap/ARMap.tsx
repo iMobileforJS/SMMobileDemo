@@ -14,6 +14,7 @@ import { ARAttributeType } from '@/containers/components/ARAttributeTable/ARAttr
 import wangge from './wangge.json'
 import { DatasetType, EngineType, Vector3, WorkspaceType } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
 import { ARAction, IARTransform } from 'imobile_for_reactnative/NativeModule/interfaces/ar/SARMap'
+import TwoPointPosition from '../components/TwoPointPosition'
 
 const styles = StyleSheet.create({
   positionDialog: {
@@ -56,6 +57,8 @@ interface State {
   position: Vector3,
   /** 用于记录校准经纬度坐标 */
   calibratePostion: Vector3,
+  /** 位置校准类型 */
+  positionType: 'singlePointPosition' | 'twoPointPosition' | 'null'
 }
 
 const AR_DATASOURCE = 'ARDatasource'
@@ -68,6 +71,7 @@ export default class ARMap extends React.Component<Props, State> {
   visible: boolean = true
   position = { x: 0, y: 0, z: 0}
   positionDialog: Dialog | undefined | null
+  positionSelectDialog: Dialog | undefined | null
   isInit = false // 是否初始化
   isCalibrate = false // 是否校准
   isOpenMap = false // 是否打开地图
@@ -83,6 +87,7 @@ export default class ARMap extends React.Component<Props, State> {
       attribute: [],
       position: {x: 0, y: 0, z: 0},
       calibratePostion: {x: 0, y: 0, z: 0},
+      positionType: 'null',
 		}
 	}
 
@@ -281,7 +286,7 @@ export default class ARMap extends React.Component<Props, State> {
 
 	getHeaderProps = (): HeaderProps => {
     return {
-      title: 'AR地图',
+      title: this.state.positionType === 'twoPointPosition' ? '两点定位' : 'AR地图',
       navigation: this.props.navigation,
       headerTitleViewStyle: {
         textAlign: 'left',
@@ -293,8 +298,19 @@ export default class ARMap extends React.Component<Props, State> {
             : 0,
       },
       backAction: async () => {
-        await this.closeARMap()
-        return this.props.navigation.goBack()
+        if(this.state.positionType === 'twoPointPosition') {
+          // 关闭两点定位和清除已添加的线
+          await SARMap.setAction(ARAction.NULL)
+          // 清除已添加到实景中的所有图片
+          await SARMap.removeAllTrackingMarker()
+          this.setState({
+            positionType: 'null',
+          })
+        } else {
+          await this.closeARMap()
+          return this.props.navigation.goBack()
+        }
+        
       },
       type: 'fix',
       isResponseHeader: true,
@@ -628,7 +644,7 @@ export default class ARMap extends React.Component<Props, State> {
         }}
       >
         {this.renderButton('位置校准', async() => {
-          this.positionDialog?.setDialogVisible(true)
+          this.positionSelectDialog?.setDialogVisible(true)
         })}
         {/* {this.renderButton('初始化', async() => {
           const homePath = await FileTools.getHomeDirectory()
@@ -728,7 +744,95 @@ export default class ARMap extends React.Component<Props, State> {
     )
   }
 
-  /** 位置校准dialog */
+  /** 校准类型选择对话框 */
+  renderPositionSelectDialog = () => {
+    return (
+      <Dialog
+        ref={ref => this.positionSelectDialog = ref}
+        cancelBtnVisible={false}
+        confirmBtnVisible={false}
+        disableBackTouch={false}
+        style={[{
+          width: scaleSize(400),
+          height: scaleSize(180),
+        }]}
+      >
+        <View style={[{
+          width: '100%',
+          // height: scaleSize(100),
+        }]}>
+          <View
+          style={[{
+            width: '100%',
+            height: scaleSize(60),
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#666',
+          }]}
+          >
+            <Text style={[{
+              fontSize: scaleSize(26),
+              fontWeight: '400',
+              color: '#fff',
+            }]}>{'校准类型'}</Text>
+          </View>
+          <View>
+            <TouchableOpacity
+             style={[{
+              width: '100%',
+              height: scaleSize(60),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }]}
+            onPress={() => {
+              this.positionSelectDialog?.setDialogVisible(false)
+              this.positionDialog?.setDialogVisible(true)
+              this.setState({
+                positionType: 'singlePointPosition',
+              })
+            }}
+            >
+              <Text>{'单点定位'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+             style={[{
+              width: '100%',
+              height: scaleSize(60),
+              justifyContent: 'center',
+              alignItems: 'center',
+            }]}
+             onPress={() => {
+              this.positionSelectDialog?.setDialogVisible(false)
+              // this.positionDialog?.setDialogVisible(true)
+              this.setState({
+                positionType: 'twoPointPosition',
+              })
+            }}
+            >
+              <Text>{'两点定位'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Dialog>
+    )
+  }
+
+  /** 两点定位界面 */
+  renderTwoPointPosition = () => {
+    return (
+      <TwoPointPosition
+      device={this.props.device}
+      close={() => {
+        this.isCalibrate = true
+        this.setState({
+          positionType: 'null',
+        })
+      }}
+      />
+    )
+  }
+
+  /** 单点定位校准dialog */
   _renderPositionDialog = () => {
     return (
       <Dialog
@@ -740,10 +844,14 @@ export default class ARMap extends React.Component<Props, State> {
           this.isCalibrate = true
           this.setState({
             calibratePostion: {...this.position},
+            positionType: 'null',
           })
         }}
         cancelAction={() => {
           this.positionDialog?.setDialogVisible(false)
+          this.setState({
+            positionType: 'null',
+          })
         }}
       >
         <View style={styles.positionDialog}>
@@ -798,10 +906,12 @@ export default class ARMap extends React.Component<Props, State> {
         headerProps={this.getHeaderProps()}
       >
         {this.renderARView()}
-        {this.renderButtons()}
-        {this.renderARAttribute()}
-        {this.state.type === 'rotation' && this.renderSliderBar()}
+        {this.state.positionType === 'null' && this.renderButtons()}
+        {this.state.positionType === 'null' && this.renderARAttribute()}
+        {this.state.positionType === 'null' && this.state.type === 'rotation' && this.renderSliderBar()}
+        {this.renderPositionSelectDialog()}
         {this._renderPositionDialog()}
+        {this.state.positionType === 'twoPointPosition' && this.renderTwoPointPosition()}
       </Container>
     )
   }
