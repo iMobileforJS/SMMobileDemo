@@ -527,7 +527,10 @@ export default class ARMap extends React.Component<Props, State> {
 
 
     // const _layerName = await SARMap.addSceneLayerKMLByJson(JSON.stringify(dataJson), kmlPath, 'OverlayKML')
-    const _layerName = await SARMap.add3DLayer(this.state.layerName, 'OverlayKML', kmlPath)
+    //先填一个kml图层
+    const _layerName = await SARMap.add3DLayer(this.state.layerName, 'OverlayKML', "")
+    //以json形式，动态添加对象
+    const bRes = await SARMap.addJsonTo3DLayer(_layerName, JSON.stringify(dataJson))
     console.warn('添加成功', _layerName, this.state.layerName, kmlPath)
     this.setState({
       kmlLayerName: _layerName,
