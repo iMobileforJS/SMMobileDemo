@@ -1,5 +1,5 @@
 import { Button, Container, Dialog, SlideBar } from '@/components'
-import { FileTools, SARMap, SData, SMARMapView, SScene, PrjCoordSysType } from 'imobile_for_reactnative'
+import { /** 用户自定义事件类*/ SUserDefine,FileTools, SARMap, SData, SMARMapView, SScene, PrjCoordSysType } from 'imobile_for_reactnative'
 import React from 'react'
 import { Image, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import ContainerType from '@/components/Container/Container'
@@ -528,9 +528,9 @@ export default class ARMap extends React.Component<Props, State> {
 
     // const _layerName = await SARMap.addSceneLayerKMLByJson(JSON.stringify(dataJson), kmlPath, 'OverlayKML')
     //先填一个kml图层
-    const _layerName = await SARMap.add3DLayer(this.state.layerName, 'OverlayKML', "")
+    const _layerName = await SARMap.add3DLayer(this.state.layerName, 'OverlayKML', kmlPath)
     //以json形式，动态添加对象
-    const bRes = await SARMap.addJsonTo3DLayer(_layerName, JSON.stringify(dataJson))
+    // const bRes = await SARMap.addJsonTo3DLayer(_layerName, JSON.stringify(dataJson))
     console.warn('添加成功', _layerName, this.state.layerName, kmlPath)
     this.setState({
       kmlLayerName: _layerName,
@@ -577,7 +577,10 @@ export default class ARMap extends React.Component<Props, State> {
     Toast.show('保存地图' + (result ? '成功' : '失败'))
     
   }
-
+  /** 执行原生范例 */
+  nativeSample = async() =>{
+    let bRes = await SUserDefine.addMapCallout('执行原生范例')
+  }
   /** 修改KML位置 */
   changeKMLPosition = async() => {
 
@@ -664,6 +667,7 @@ export default class ARMap extends React.Component<Props, State> {
         {this.renderButton('保存KML', this.saveKML)}
         {this.renderButton('保存地图', this.saveMap)}
         {this.renderButton('修改坐标', this.changeKMLPosition)}
+        {this.renderButton('原生范例', this.nativeSample)}
       </ScrollView>
     )
   }
