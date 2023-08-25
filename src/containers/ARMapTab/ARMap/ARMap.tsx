@@ -13,7 +13,7 @@ import { ARAttributeTable } from '@/containers/components'
 import { ARAttributeType } from '@/containers/components/ARAttributeTable/ARAttributeTable'
 import wangge from './wangge.json'
 import { DatasetType, EngineType, Vector3, WorkspaceType } from 'imobile_for_reactnative/NativeModule/interfaces/data/SData'
-import { ARAction, IARTransform } from 'imobile_for_reactnative/NativeModule/interfaces/ar/SARMap'
+import { ARAction, ARLayerType, IARTransform } from 'imobile_for_reactnative/NativeModule/interfaces/ar/SARMap'
 import TwoPointPosition from '../components/TwoPointPosition'
 
 const styles = StyleSheet.create({
@@ -66,6 +66,8 @@ const AR_DATASET = 'ARDataset'
 const USERNAME = 'Customer'
 const DEMO_NAME = '地砖模型03'
 
+let count = 1
+
 export default class ARMap extends React.Component<Props, State> {
   container: ContainerType | undefined | null
   visible: boolean = true
@@ -75,6 +77,8 @@ export default class ARMap extends React.Component<Props, State> {
   isInit = false // 是否初始化
   isCalibrate = false // 是否校准
   isOpenMap = false // 是否打开地图
+
+  selectItem: {layerName: string, id: number} | undefined
 
   constructor(props: Props) {
 		super(props)
@@ -113,6 +117,7 @@ export default class ARMap extends React.Component<Props, State> {
     await SARMap.setAR3DLayerSelectListener(
       async (result) => {
         try {
+          this.selectItem = {layerName: result.layerName, id: result.id}
           const fieldinfos = await SARMap.getAR3DLayerFieldValueOfSelectedObject(result.layerName)
 
           const arr: Array<ARAttributeType> = []
@@ -350,6 +355,20 @@ export default class ARMap extends React.Component<Props, State> {
 		}
   }
 
+  /** 隐藏三维场景中的所有图层 */
+  hideLayers = () => {
+      //隐藏场景中的所有图层
+      SARMap.getLayers().then(layers => {
+        layers.map(layer => {
+          if(layer.type === ARLayerType.AR_SCENE_LAYER) {
+            layer.ar3DLayers.map(ar3dlayer => {
+              SARMap.setLayerVisible(ar3dlayer.name, false)
+            })
+          }
+        })
+      })
+  }
+
 	/** 添加Online三维图层 */
   add3DOnline = async (url: string, name: string) => {
 		try {
@@ -537,6 +556,111 @@ export default class ARMap extends React.Component<Props, State> {
     })
   }
 
+  /** 
+   * 动态添加KML，本示例需要使用单点校准位置 
+   */
+  dynamicAddKML = async () => {
+    if (!this.state.layerName) {
+      Toast.show('请先添加三维图层')
+      return
+    }
+    const layerName = 'OverlayKML'
+
+    //校准点经纬度
+    const fixPosition = this.state.calibratePostion
+    
+    //在校准点位置动态构造一个等腰三角形,顶角指向正北方向
+    //为了演示方便，此处直接进行了经纬度的加减，
+    //在应用时最好根据实际情况精确获取每个点的经纬度
+    const geometries = [{
+      type: "Polygon",
+      "coordinates": [
+        [
+          fixPosition.x,
+          fixPosition.y + 0.000001,
+          fixPosition.z
+        ],
+        [
+          fixPosition.x + 0.0000005,
+          fixPosition.y - 0.000001,
+          fixPosition.z
+        ],
+        [
+          fixPosition.x - 0.0000005,
+          fixPosition.y - 0.000001,
+          fixPosition.z
+        ],
+      ],
+      "style": {
+        "FillForeColor": -16711936,
+        "LineColor": -16711936,
+        "LineWidth": 10,
+        "AltitudeMode": 2
+      }
+    }]
+    
+    const dataJson = {
+      layerName: layerName,
+      geometries: geometries,
+    }
+
+    //添加kml图层
+    const _layerName = await SARMap.add3DLayer(this.state.layerName, 'OverlayKML')
+
+    //以json形式，动态添加对象
+    const bRes = await SARMap.addJsonTo3DLayer(_layerName, JSON.stringify(dataJson))
+
+    console.warn(bRes?'添加成功':'添加失败', _layerName)
+    this.setState({
+      kmlLayerName: _layerName,
+    })
+  }
+
+  /**
+   * 修改动态添加的kml对象的位置
+   */
+  updateSelectedKMLGeometry = async () => {
+    if(!this.selectItem || this.selectItem.layerName === '') {
+      Toast.show('请先选择kml对象')
+      return
+    }
+
+    const layerName = this.selectItem.layerName
+    const id = this.selectItem.id
+
+    //校准点经纬度
+    const fixPosition = this.state.calibratePostion
+
+    // 调用 dynamicAddKML() 动态添加的三角形
+    const coordinates: [number,number,number][] =  [
+      [
+        fixPosition.x,
+        fixPosition.y + 0.000001,
+        fixPosition.z
+      ],
+      [
+        fixPosition.x + 0.0000005,
+        fixPosition.y - 0.000001,
+        fixPosition.z
+      ],
+      [
+        fixPosition.x - 0.0000005,
+        fixPosition.y - 0.000001,
+        fixPosition.z
+      ],
+    ]
+
+    //每个点朝北移动的纬度偏移量
+    const offset = 0.000001 * count
+    coordinates.forEach(coord => {
+      coord[1] +=  offset
+    })
+
+    const res = await SARMap.updateAR3DGeometry(layerName, id, {coordinates})
+
+    count++
+  }
+
   /** 移除KML */
   removeKML = async () => {
     if (!this.state.layerName) {
@@ -661,8 +785,11 @@ export default class ARMap extends React.Component<Props, State> {
         {this.renderButton('打开地图', this.openMap)}
         {this.renderButton('关闭地图', this.closeMap)}
         {this.renderButton('添加地砖', this.addScenceLayer)}
+        {this.renderButton('隐藏地砖', this.hideLayers)}
         {this.renderButton('编辑图层', this.editLayer)}
-        {this.renderButton('添加KML', this.addKML)}
+        {/* {this.renderButton('添加KML', this.addKML)} */}
+        {this.renderButton('动态KML', this.dynamicAddKML)}
+        {this.renderButton('修改KML', this.updateSelectedKMLGeometry)}
         {this.renderButton('移除KML', this.removeKML)}
         {this.renderButton('保存KML', this.saveKML)}
         {this.renderButton('保存地图', this.saveMap)}
